@@ -13,9 +13,9 @@ const index = () => {
   const { t } = useTranslation();
   const { isLoggedIn } = useGlobalContext();
 
-  useEffect(() => {
-    if (isLoggedIn) router.replace("/home");
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn) router.replace("/home");
+  // }, [isLoggedIn]);
   return (
     <SafeAreaView className="h-full">
       <View className="items-center justify-center w-full h-full">

@@ -1,25 +1,51 @@
-import {
-  ScrollView,
-  Alert,
-  TouchableOpacity,
-  useColorScheme,
-} from "react-native";
+import { ScrollView, Alert, View, useColorScheme } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Image } from "react-native";
 import FormField from "@/components/FormField";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { register } from "@/helpers/Login";
+import { auth, register } from "@/helpers/Login";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import LightButton from "@/assets/images/android_light_sq_ctn.svg";
 import DarkButton from "@/assets/images/android_dark_sq_ctn.svg";
-import { GoogleSigninButton } from "react-native-google-signin";
-import { View } from "react-native";
+import { makeRedirectUri } from "expo-auth-session";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
 
 const SignUp = () => {
+  const redirectTo = makeRedirectUri();
+
+  const createSessionFromUrl = async (url: string) => {
+    const { params } = QueryParams.getQueryParams(url);
+
+    const { token, refreshToken, email } = params;
+
+    if (token && refreshToken && email) {
+      setUser({
+        refreshToken,
+        email,
+        token,
+      });
+      router.replace("/home");
+    }
+    return;
+  };
+  const performOAuth = async () => {
+    const { url } = await auth();
+
+    const res = await WebBrowser.openAuthSessionAsync(url ?? "", redirectTo);
+
+    if (res.type === "success") {
+      const { url } = res;
+      await createSessionFromUrl(url);
+    }
+  };
+
+  const url = Linking.useURL();
+  if (url) createSessionFromUrl(url);
   const colorScheme = useColorScheme();
   const Button =
     colorScheme === "light"

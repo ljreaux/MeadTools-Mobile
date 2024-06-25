@@ -83,3 +83,14 @@ const refreshToken = async (refreshToken: string, email: string) => {
   const data = await response.json();
   return data;
 };
+
+export async function auth() {
+  const response = await fetch(`${API_URL}/request`, {
+    headers: { "Content-Type": "application/json" },
+    method: "POST",
+    body: JSON.stringify({ mobile: true }),
+  });
+  const data = await response.json();
+
+  return data;
+}

@@ -5,15 +5,14 @@ import {
   useColorScheme,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Image } from "react-native";
 import FormField from "@/components/FormField";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { login } from "@/helpers/Login";
+import { auth, login } from "@/helpers/Login";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import LightButton from "@/assets/images/android_light_sq_ctn.svg";
 import DarkButton from "@/assets/images/android_dark_sq_ctn.svg";
@@ -21,30 +20,24 @@ import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-import { API_URL } from "../_layout";
-const redirectTo = makeRedirectUri();
 
 const SignIn = () => {
-  async function auth() {
-    const response = await fetch(`${API_URL}/request`, {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({ mobile: true }),
-    });
-    const data = await response.json();
+  const redirectTo = makeRedirectUri();
 
-    return data;
-  }
   const createSessionFromUrl = async (url: string) => {
     const { params } = QueryParams.getQueryParams(url);
 
-    const { token } = params;
-    console.log(token);
-    setUser({
-      ...user,
-      token,
-    });
-    router.replace("/home");
+    const { token, refreshToken, email } = params;
+
+    if (token && refreshToken && email) {
+      setUser({
+        refreshToken,
+        email,
+        token,
+      });
+      router.replace("/home");
+    }
+    return;
   };
   const performOAuth = async () => {
     const { url } = await auth();
@@ -56,8 +49,10 @@ const SignIn = () => {
       await createSessionFromUrl(url);
     }
   };
+
   const url = Linking.useURL();
   if (url) createSessionFromUrl(url);
+
   const colorScheme = useColorScheme();
   const Button =
     colorScheme === "light"
