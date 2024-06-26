@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, Text } from "react-native";
+import { Image, StyleSheet, Platform, Text, TextInput } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -10,16 +10,33 @@ import { IngredientListItem } from "@/helpers/Ingredients";
 import { DropdownComponent as Dropdown } from "@/components/Dropdown";
 
 export default function HomeScreen() {
-  const { ingredients } = useGlobalContext();
+  const { ingredients, recipeData } = useGlobalContext();
   const ingredientsDropdown = ingredients.map((ing: IngredientListItem) => ({
     label: ing.name,
-    value: ing.sugar_content,
+    value: ing.name,
   }));
-  const map = new Array(5).fill(0);
+  const map = new Array(4).fill(0);
   return (
     <View className="justify-center w-screen h-screen ">
       {map.map((item, i) => (
-        <Dropdown data={ingredientsDropdown} index={i + 1} key={i} />
+        <View key={i}>
+          <Dropdown data={ingredientsDropdown} index={i} />
+          <TextInput
+            value={recipeData.ingredients[i].details[0].toString()}
+            keyboardType="numeric"
+            placeholder="0"
+          />
+          <TextInput
+            value={recipeData.ingredients[i].brix.toString()}
+            keyboardType="numeric"
+            placeholder="0"
+          />
+          <TextInput
+            value={recipeData.ingredients[i].details[1].toString()}
+            keyboardType="numeric"
+            placeholder="0"
+          />
+        </View>
       ))}
     </View>
   );

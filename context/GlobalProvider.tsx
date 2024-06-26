@@ -5,6 +5,7 @@ import getAllIngredients, { IngredientListItem } from "@/helpers/Ingredients";
 import { useTranslation } from "react-i18next";
 import lodash from "lodash";
 import { ingredientTranslations } from "@/localization/ingredients";
+import { initialIngredients } from "@/constants/initialIngredients";
 interface ContextType {
   isLogged: boolean;
   setIsLogged: React.Dispatch<React.SetStateAction<boolean>>;
@@ -35,7 +36,22 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   }>(currentUser.token ? currentUser : null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMetric, setIsMetric] = useState(false);
   const [ingredients, setIngredients] = useState<IngredientListItem[]>([]);
+  const [recipeData, setRecipeData] = useState({
+    ingredients: initialIngredients,
+    OG: 0,
+    volume: 0,
+    ABV: 0,
+    FG: 0.996,
+    offset: 0,
+    units: {
+      weight: isMetric ? "kg" : "lbs",
+      volume: isMetric ? "liter" : "gal",
+    },
+    additives: [{ name: "", amount: 0, unit: "g" }],
+  });
+
   const { t } = useTranslation();
   const sortingFn = (a: IngredientListItem, b: IngredientListItem) => {
     // putting Honey and Water at top of list
@@ -105,6 +121,11 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         setUserData,
         loading,
         ingredients,
+        setIngredients,
+        recipeData,
+        setRecipeData,
+        isMetric,
+        setIsMetric,
       }}
     >
       {children}

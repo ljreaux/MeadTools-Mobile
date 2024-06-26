@@ -1,8 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, useColorScheme } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { Colors } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { toSG } from "@/helpers/unitConverters";
+import { IngredientListItem } from "@/helpers/Ingredients";
+export interface IngredientType {
+  name: string;
+  brix: number;
+  details: number[];
+  secondary: boolean;
+  category: string;
+}
+export interface Additive {
+  name: string;
+  amount: number;
+  unit: string;
+}
+export interface RecipeData {
+  ingredients: IngredientType[];
+  OG: number;
+  volume: number;
+  ABV: number;
+  FG: number;
+  offset: number;
+  units: {
+    weight: "lbs" | "kg";
+    volume: "gal" | "liter";
+  };
+  sorbate?: number;
+  sulfite?: number;
+  campden?: number;
+  additives: Additive[];
+}
 
 export const DropdownComponent = ({
   data,
@@ -11,11 +42,70 @@ export const DropdownComponent = ({
   data: { label: string; value: string }[];
   index: number;
 }) => {
+  const { recipeData, setRecipeData, ingredients } = useGlobalContext();
   const [value, setValue] = useState<null | string>(null);
   const [isFocus, setIsFocus] = useState(false);
   const backgroundColor = useThemeColor({}, "background");
   const tint = useThemeColor({}, "tint");
   const textColor = useThemeColor({}, "text");
+
+  useEffect(() => {
+    changeIngredient();
+  }, [value]);
+
+  function setIndividual(index: number, ingredient: Partial<IngredientType>) {
+    setRecipeData((prev: RecipeData) => {
+      const newIngredient = prev.ingredients.map((ing, i) =>
+        i === index ? { ...ing, ...ingredient } : ing
+      );
+
+      return {
+        ...prev,
+        ingredients: newIngredient,
+      };
+    });
+  }
+  const converter =
+    recipeData.units.weight === "kg" && recipeData.units.volume === "liter"
+      ? (8.345 * 0.453592) / 3.78541
+      : recipeData.units.weight === "kg"
+      ? 8.345 * 0.453592
+      : recipeData.units.volume === "liter"
+      ? 8.345 / 3.78541
+      : 8.345;
+
+  const changeIngredient = () => {
+    const {
+      sugar_content: brix,
+      name,
+      category,
+    } = ingredients.find(
+      (ingredient: IngredientListItem) => ingredient.name === value
+    ) || {
+      sugar_content: 0,
+      name: "error",
+      category: "error",
+    };
+
+    console.log(name);
+
+    setRecipeData((prev) => {
+      const newIngredients = prev.ingredients.map((ing, i) =>
+        i === index
+          ? {
+              ...ing,
+              brix: brix,
+              category,
+              name,
+            }
+          : ing
+      );
+      return {
+        ...prev,
+        ingredients: newIngredients,
+      };
+    });
+  };
 
   const renderLabel = () => {
     if (value || isFocus) {
@@ -27,7 +117,7 @@ export const DropdownComponent = ({
             { backgroundColor, color: textColor },
           ]}
         >
-          Ingredient {index}
+          Ingredient {index + 1}
         </Text>
       );
     }
