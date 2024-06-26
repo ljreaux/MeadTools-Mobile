@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { getUserInfo as getCurrentUser } from "@/helpers/Login";
-
+import getAllIngredients, { IngredientListItem } from "@/helpers/Ingredients";
+import { useTranslation } from "react-i18next";
+import lodash from "lodash";
+import { ingredientTranslations } from "@/localization/ingredients";
 interface ContextType {
   isLogged: boolean;
   setIsLogged: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +35,28 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   }>(currentUser.token ? currentUser : null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [ingredients, setIngredients] = useState<IngredientListItem[]>([]);
+  const { t } = useTranslation();
+  const sortingFn = (a: IngredientListItem, b: IngredientListItem) => {
+    // putting Honey and Water at top of list
+    if (a.name === "Honey" || (a.name === "Water" && b.name !== "Honey"))
+      return -1;
+    if (b.name === "Honey" || (b.name === "Water" && a.name !== "Honey"))
+      return 1;
+
+    const nameA = t(`${lodash.camelCase(a.name)}`).toLowerCase(); // ignore upper and lowercase
+    const nameB = t(`${lodash.camelCase(b.name)}`).toLowerCase(); // ignore upper and lowercase
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+
+    // names must be equal
+    return 0;
+  };
 
   useEffect(() => {
     const token = user?.token || "";
@@ -56,6 +81,17 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
       .finally(() => {
         setLoading(false);
       });
+
+    getAllIngredients()
+      .then((res) => {
+        return res.sort((a: IngredientListItem, b: IngredientListItem) =>
+          sortingFn(a, b)
+        );
+      })
+      .then((ingredients) => setIngredients(ingredients))
+      .catch((error) => {
+        console.log(error);
+      });
   }, [user]);
 
   return (
@@ -68,6 +104,7 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         userData,
         setUserData,
         loading,
+        ingredients,
       }}
     >
       {children}
