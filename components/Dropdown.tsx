@@ -43,7 +43,9 @@ export const DropdownComponent = ({
   index: number;
 }) => {
   const { recipeData, setRecipeData, ingredients } = useGlobalContext();
-  const [value, setValue] = useState<null | string>(null);
+  const [value, setValue] = useState<null | string>(
+    recipeData.ingredients[index].name
+  );
   const [isFocus, setIsFocus] = useState(false);
   const backgroundColor = useThemeColor({}, "background");
   const tint = useThemeColor({}, "tint");
@@ -52,27 +54,6 @@ export const DropdownComponent = ({
   useEffect(() => {
     changeIngredient();
   }, [value]);
-
-  function setIndividual(index: number, ingredient: Partial<IngredientType>) {
-    setRecipeData((prev: RecipeData) => {
-      const newIngredient = prev.ingredients.map((ing, i) =>
-        i === index ? { ...ing, ...ingredient } : ing
-      );
-
-      return {
-        ...prev,
-        ingredients: newIngredient,
-      };
-    });
-  }
-  const converter =
-    recipeData.units.weight === "kg" && recipeData.units.volume === "liter"
-      ? (8.345 * 0.453592) / 3.78541
-      : recipeData.units.weight === "kg"
-      ? 8.345 * 0.453592
-      : recipeData.units.volume === "liter"
-      ? 8.345 / 3.78541
-      : 8.345;
 
   const changeIngredient = () => {
     const {
@@ -87,9 +68,7 @@ export const DropdownComponent = ({
       category: "error",
     };
 
-    console.log(name);
-
-    setRecipeData((prev) => {
+    setRecipeData((prev: RecipeData) => {
       const newIngredients = prev.ingredients.map((ing, i) =>
         i === index
           ? {
@@ -146,7 +125,6 @@ export const DropdownComponent = ({
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={index > 2 ? data[0].label : data[1].label}
         searchPlaceholder="Search..."
         value={value}
         onFocus={() => setIsFocus(true)}
@@ -165,9 +143,11 @@ export default DropdownComponent;
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    width: "80%",
   },
   dropdown: {
     height: 50,
+    width: "100%",
     borderColor: "gray",
     borderWidth: 0.5,
     borderRadius: 8,

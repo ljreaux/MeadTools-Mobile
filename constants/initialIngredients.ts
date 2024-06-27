@@ -1,27 +1,27 @@
 export const initialIngredients = [
   {
-    name: "water",
-    brix: 0,
-    details: [1, 1],
-    secondary: false,
-    category: "water",
-  },
-  {
-    name: "water",
+    name: "Water",
     brix: 0,
     details: [0, 0],
     secondary: false,
     category: "water",
   },
   {
-    name: "honey",
+    name: "Water",
+    brix: 0,
+    details: [0, 0],
+    secondary: false,
+    category: "water",
+  },
+  {
+    name: "Honey",
     brix: 79.6,
     details: [0, 0],
     secondary: false,
     category: "sugar",
   },
   {
-    name: "honey",
+    name: "Honey",
     brix: 79.6,
     details: [0, 0],
     secondary: false,
