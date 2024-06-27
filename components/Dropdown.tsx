@@ -7,6 +7,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import { toSG } from "@/helpers/unitConverters";
 import { IngredientListItem } from "@/helpers/Ingredients";
 export interface IngredientType {
+  id: number;
   name: string;
   brix: number;
   details: number[];

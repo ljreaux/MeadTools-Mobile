@@ -21,23 +21,31 @@ import { SafeAreaView } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { toSG } from "@/helpers/unitConverters";
 import { AntDesign } from "@expo/vector-icons";
+import { useEffect } from "react";
 
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const { recipeData, setRecipeData } = useGlobalContext();
+  const primaryIngredients = recipeData.ingredients.filter(
+    (ingredient: IngredientType) => !ingredient.secondary
+  );
+  const secondaryIngredients = recipeData.ingredients.filter(
+    (ingredient: IngredientType) => ingredient.secondary
+  );
 
-  const addIngredientLine = () => {
+  const addIngredientLine = (secondary: boolean) => {
     setRecipeData((prev: RecipeData) => {
       return {
         ...prev,
         ingredients: [
           ...prev.ingredients,
           {
-            name: "honey",
+            id: recipeData.ingredients.length + 1,
+            name: "Honey",
             brix: 79.6,
             details: [0, 0],
-            secondary: false,
+            secondary,
             category: "sugar",
           },
         ],
@@ -45,11 +53,11 @@ export default function HomeScreen() {
     });
   };
 
-  function removeLine(index: number) {
+  function removeLine(id: number) {
     setRecipeData((prev: RecipeData) => {
       return {
         ...prev,
-        ingredients: prev.ingredients.filter((_, i) => i !== index),
+        ingredients: prev.ingredients.filter((ing) => ing.id !== id),
       };
     });
   }
@@ -73,7 +81,7 @@ export default function HomeScreen() {
             >
               Primary Ingredients
             </Text>
-            {recipeData.ingredients.map((item: IngredientType, i: number) => (
+            {primaryIngredients.map((item: IngredientType, i: number) => (
               <IngredientRow
                 index={i}
                 ingredient={item}
@@ -84,14 +92,14 @@ export default function HomeScreen() {
             <ThemedView className="py-8 mb-24 flex-row justify-center items-center">
               <TouchableOpacity
                 className="mx-4"
-                onPress={addIngredientLine}
-                disabled={recipeData.ingredients.length > 10}
+                onPress={() => addIngredientLine(false)}
+                disabled={primaryIngredients.length > 10}
               >
                 <AntDesign
                   name="plussquare"
                   size={36}
                   color={
-                    recipeData.ingredients.length > 10
+                    primaryIngredients.length > 10
                       ? `${backgroundColor}`
                       : `${textColor}`
                   }
@@ -99,14 +107,68 @@ export default function HomeScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 className="mx-4"
-                onPress={() => removeLine(recipeData.ingredients.length - 1)}
-                disabled={recipeData.ingredients.length < 5}
+                onPress={() =>
+                  removeLine(
+                    primaryIngredients[primaryIngredients.length - 1].id
+                  )
+                }
+                disabled={primaryIngredients.length < 5}
               >
                 <AntDesign
                   name="minussquare"
                   size={36}
                   color={
-                    recipeData.ingredients.length < 5
+                    primaryIngredients.length < 5
+                      ? `${backgroundColor}`
+                      : `${textColor}`
+                  }
+                />
+              </TouchableOpacity>
+            </ThemedView>
+            <Text
+              style={{ color: textColor }}
+              className="text-2xl py-4 text-center"
+            >
+              Secondary Ingredients
+            </Text>
+            {secondaryIngredients.map((item: IngredientType, i: number) => (
+              <IngredientRow
+                index={i}
+                ingredient={item}
+                key={i}
+                removeLine={removeLine}
+              />
+            ))}
+            <ThemedView className="py-8 mb-24 flex-row justify-center items-center">
+              <TouchableOpacity
+                className="mx-4"
+                onPress={() => addIngredientLine(true)}
+                disabled={secondaryIngredients.length > 10}
+              >
+                <AntDesign
+                  name="plussquare"
+                  size={36}
+                  color={
+                    secondaryIngredients.length > 10
+                      ? `${backgroundColor}`
+                      : `${textColor}`
+                  }
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="mx-4"
+                onPress={() =>
+                  removeLine(
+                    secondaryIngredients[secondaryIngredients.length - 1].id
+                  )
+                }
+                disabled={secondaryIngredients.length <= 0}
+              >
+                <AntDesign
+                  name="minussquare"
+                  size={36}
+                  color={
+                    secondaryIngredients.length <= 0
                       ? `${backgroundColor}`
                       : `${textColor}`
                   }
@@ -193,7 +255,7 @@ const IngredientRow = ({
       });
     }
   };
-  const disabled = index < 4;
+  const disabled = index < 4 && !ingredient.secondary;
 
   return (
     <ThemedView key={index}>
@@ -201,7 +263,7 @@ const IngredientRow = ({
         <Dropdown data={ingredientsDropdown} index={index} />
         <TouchableOpacity
           className="pr-6"
-          onPress={() => removeLine(index)}
+          onPress={() => removeLine(ingredient.id)}
           disabled={disabled}
         >
           <AntDesign
@@ -222,6 +284,9 @@ const IngredientRow = ({
             value={recipeData.ingredients[index].brix.toString()}
             keyboardType="numeric"
             placeholder="0"
+            onChangeText={(e) =>
+              updateIngredientAmount(e, index, null, ingredient)
+            }
           />
         </View>
         <View className="mx-4 text-center items-center">
