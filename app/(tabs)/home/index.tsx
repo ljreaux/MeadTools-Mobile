@@ -21,7 +21,8 @@ import { SafeAreaView } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { toSG } from "@/helpers/unitConverters";
 import { AntDesign } from "@expo/vector-icons";
-import { useEffect } from "react";
+import CustomButton from "@/components/CustomButton";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
@@ -89,7 +90,7 @@ export default function HomeScreen() {
                 removeLine={removeLine}
               />
             ))}
-            <ThemedView className="py-8 mb-24 flex-row justify-center items-center">
+            <ThemedView className="py-8 mb-8 flex-row justify-center items-center">
               <TouchableOpacity
                 className="mx-4"
                 onPress={() => addIngredientLine(false)}
@@ -139,7 +140,7 @@ export default function HomeScreen() {
                 removeLine={removeLine}
               />
             ))}
-            <ThemedView className="py-8 mb-24 flex-row justify-center items-center">
+            <ThemedView className="py-8 flex-row justify-center items-center">
               <TouchableOpacity
                 className="mx-4"
                 onPress={() => addIngredientLine(true)}
@@ -175,6 +176,11 @@ export default function HomeScreen() {
                 />
               </TouchableOpacity>
             </ThemedView>
+            <CustomButton
+              title="Submit"
+              containerStyles="mb-24"
+              handlePress={() => router.push("/home/submit")}
+            />
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
