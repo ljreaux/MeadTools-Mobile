@@ -203,15 +203,49 @@ const IngredientRow = ({
   removeLine: (index: number) => void;
 }) => {
   const { ingredients, recipeData, setRecipeData } = useGlobalContext();
+  const { units } = recipeData;
+  const converter =
+    units.weight === "kg" && units.volume === "liter"
+      ? (8.345 * 0.453592) / 3.78541
+      : units.weight === "kg"
+      ? 8.345 * 0.453592
+      : units.volume === "liter"
+      ? 8.345 / 3.78541
+      : 8.345;
   const [textDetails, setTextDetails] = useState({
     ingredients: recipeData.ingredients.map((ing) => {
       return {
         id: ing.id,
-        details: ing.details.map((det) => det.toString()),
+        details: ing.details.map((det) => det.toFixed(3)),
         brix: ing.brix.toString(),
       };
     }),
   });
+
+  const createDetailCopy = (
+    text: string,
+    index: number,
+    type: "number" | "string"
+  ) => {
+    const value = Number(text);
+    const otherIndex = index === 0 ? 1 : 0;
+    const detailCopy = [];
+    const textArray = [];
+    detailCopy[index] = value;
+    detailCopy[otherIndex] =
+      otherIndex === 0
+        ? value * converter * toSG(ingredient.brix)
+        : value / converter / toSG(ingredient.brix);
+
+    if (type === "number") {
+      detailCopy[index] = value;
+      return detailCopy;
+    } else {
+      textArray[index] = text;
+      textArray[otherIndex] = detailCopy[otherIndex].toFixed(3);
+      return textArray;
+    }
+  };
 
   const setTextDetail = (text: string, id = 0, index: number | null) => {
     setTextDetails(({ ingredients }) => {
@@ -221,11 +255,8 @@ const IngredientRow = ({
             id === ing.id ? { ...ing, brix: text } : ing
           ),
         };
-      const detailCopy = ingredients.find((ing) => ing.id === id)?.details || [
-        "error",
-        "error",
-      ];
-      detailCopy[index] = text;
+
+      const detailCopy = createDetailCopy(text, index, "string") as string[];
       return {
         ingredients: ingredients.map((ing) =>
           ing.id === id ? { ...ing, details: detailCopy } : ing
@@ -240,8 +271,6 @@ const IngredientRow = ({
   }));
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
-
-  const { units } = recipeData;
 
   function setIndividual(id: number, ingredient: Partial<IngredientType>) {
     setRecipeData((prev: RecipeData) => {
@@ -261,26 +290,13 @@ const IngredientRow = ({
     detailIndex: number | null,
     ingredient: IngredientType
   ) => {
-    const converter =
-      units.weight === "kg" && units.volume === "liter"
-        ? (8.345 * 0.453592) / 3.78541
-        : units.weight === "kg"
-        ? 8.345 * 0.453592
-        : units.volume === "liter"
-        ? 8.345 / 3.78541
-        : 8.345;
-
     const value = Number(text);
     if (typeof detailIndex === "number") {
-      const otherIndex = detailIndex === 0 ? 1 : 0;
-      const detailCopy = [];
-      detailCopy[detailIndex] = value;
-      detailCopy[otherIndex] =
-        otherIndex === 0
-          ? Math.round(value * converter * toSG(ingredient.brix) * 10000) /
-            10000
-          : Math.round((value / converter / toSG(ingredient.brix)) * 10000) /
-            10000;
+      const detailCopy = createDetailCopy(
+        text,
+        detailIndex,
+        "number"
+      ) as number[];
 
       setIndividual(id, {
         details: detailCopy,
