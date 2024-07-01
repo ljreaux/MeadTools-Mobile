@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import * as SecureStore from "expo-secure-store";
 import { getUserInfo as getCurrentUser } from "@/helpers/Login";
 import getAllIngredients, { IngredientListItem } from "@/helpers/Ingredients";
@@ -6,23 +13,39 @@ import { useTranslation } from "react-i18next";
 import lodash from "lodash";
 import { ingredientTranslations } from "@/localization/ingredients";
 import { initialIngredients } from "@/constants/initialIngredients";
+import { RecipeData } from "@/components/Dropdown";
+import { toBrix, toSG } from "@/helpers/unitConverters";
+import useBlend from "@/hooks/useBlend";
+import useAbv from "@/hooks/useAbv";
+type User = null | {
+  token: string;
+  refreshToken: string | null;
+};
 interface ContextType {
-  isLogged: boolean;
-  setIsLogged: React.Dispatch<React.SetStateAction<boolean>>;
-  user: null | { id: string; token: string; resfreshToken: string | null };
-  setUser: React.Dispatch<
-    React.SetStateAction<null | {
-      id: string;
-      token: string;
-      resfreshToken: string | null;
-    }>
-  >;
+  isLoggedIn: boolean;
+  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+  user: User;
+  setUser: Dispatch<SetStateAction<User>>;
+  userData: unknown;
+  setUserData: Dispatch<SetStateAction<unknown>>;
   loading: boolean;
+  ingredients: IngredientListItem[];
+  setIngredients: Dispatch<SetStateAction<IngredientListItem>>;
+  recipeData: RecipeData;
+  setRecipeData: Dispatch<SetStateAction<RecipeData>>;
+  isMetric: boolean;
+  setIsMetric: Dispatch<SetStateAction<boolean>>;
+  setSubmit: Dispatch<SetStateAction<boolean>>;
+  blendFG: number;
+  ABV: number;
+  delle: number;
+  totalPrimaryVolume: number;
+  totalVolume: number;
 }
 
-const GlobalContext = createContext<null | any>(null);
+const GlobalContext = createContext<any>(null);
 
-export const useGlobalContext = () => useContext(GlobalContext);
+export const useGlobalContext = () => useContext<ContextType>(GlobalContext);
 
 const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const currentUser = {
@@ -51,6 +74,7 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     },
     additives: [{ name: "", amount: 0, unit: "g" }],
   });
+  const [submit, setSubmit] = useState(false);
 
   const { t } = useTranslation();
   const sortingFn = (a: IngredientListItem, b: IngredientListItem) => {
@@ -110,11 +134,98 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
       });
   }, [user]);
 
+  const totalBlended = recipeData.ingredients.map((ingredient) => {
+    return [toSG(ingredient.brix), ingredient.details[1]];
+  });
+  const withOutSecondary: number[][] = [];
+  const justSecondary: number[][] = [];
+  const offsetArr: number[] = [];
+  recipeData.ingredients.forEach((ingredient) => {
+    if (!ingredient.secondary) {
+      withOutSecondary.push([toSG(ingredient.brix), ingredient.details[1]]);
+      if (ingredient.category === "fruit")
+        offsetArr.push(ingredient.details[0] * 25);
+    } else {
+      justSecondary.push([toSG(ingredient.brix), ingredient.details[1]]);
+    }
+  });
+  const { blend, runBlendingFunction } = useBlend(totalBlended);
+  const {
+    blend: noSecondaryBlend,
+    runBlendingFunction: secondaryBlendFunction,
+  } = useBlend(withOutSecondary);
+  const secondaryBlend = useBlend(justSecondary);
+
+  function runBlends() {
+    (async () => {
+      runBlendingFunction();
+      secondaryBlendFunction();
+    })().then(() => {
+      secondaryBlend.runBlendingFunction();
+    });
+  }
+
+  const [blendFG, setBlendFG] = useState(
+    Math.round(
+      ((noSecondaryBlend.totalVolume * recipeData.FG +
+        secondaryBlend.blend.totalVolume * secondaryBlend.blend.blendedValue) /
+        blend.totalVolume) *
+        1000
+    ) / 1000 || recipeData.FG
+  );
+
+  useEffect(() => {
+    if (submit) {
+      console.log(noSecondaryBlend, recipeData.FG, secondaryBlend, blend);
+      runBlends();
+    }
+    setSubmit(false);
+  }, [submit]);
+  useEffect(() => {
+    setBlendFG(
+      Math.round(
+        ((noSecondaryBlend.totalVolume * recipeData.FG +
+          secondaryBlend.blend.totalVolume *
+            secondaryBlend.blend.blendedValue) /
+          blend.totalVolume) *
+          1000
+      ) / 1000
+    );
+  }, [noSecondaryBlend, recipeData.FG, secondaryBlend, blend]);
+
+  function calculateABV({ ABV, delle }: { ABV: number; delle: number }) {
+    if (blend.blendedValue > noSecondaryBlend.blendedValue) {
+      const numerator = ABV * noSecondaryBlend.totalVolume;
+      const denominator = blend.totalVolume;
+      ABV = numerator / denominator;
+      delle = toBrix(recipeData.FG) + 4.5 * ABV;
+    }
+    setRecipeData((prev) => ({
+      ...prev,
+      OG: noSecondaryBlend.blendedValue,
+      FG: 0.996,
+      offset: offsetArr.reduce((prev, curr) => {
+        return curr / noSecondaryBlend.totalVolume + prev;
+      }, 0),
+      volume: noSecondaryBlend.totalVolume,
+      ABV,
+    }));
+    return { ABV, delle };
+  }
+
+  const ABVOBJ = useAbv({ OG: blend.blendedValue, FG: blendFG });
+
+  const [{ ABV, delle }, setABVDelle] = useState({ ABV: 0, delle: 0 });
+
+  useEffect(() => {
+    setABVDelle(calculateABV(ABVOBJ));
+  }, [ABVOBJ.ABV]);
+
   return (
     <GlobalContext.Provider
       value={{
-        isLoggedIn: isLoggedIn,
-        setIsLoggedIn: setIsLoggedIn,
+        isLoggedIn,
+        setIsLoggedIn,
         user,
         setUser,
         userData,
@@ -126,6 +237,13 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         setRecipeData,
         isMetric,
         setIsMetric,
+        blendFG,
+        setSubmit,
+        ABV,
+        delle,
+        totalPrimaryVolume:
+          Math.round(noSecondaryBlend.totalVolume * 1000) / 1000,
+        totalVolume: Math.round(blend.totalVolume * 1000) / 1000,
       }}
     >
       {children}

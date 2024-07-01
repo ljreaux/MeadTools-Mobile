@@ -38,15 +38,15 @@ export interface RecipeData {
 
 export const DropdownComponent = ({
   data,
-  index,
+  id,
 }: {
   data: { label: string; value: string }[];
-  index: number;
+  id: number;
 }) => {
   const { recipeData, setRecipeData, ingredients } = useGlobalContext();
-  const [value, setValue] = useState<null | string>(
-    recipeData.ingredients[index].name
-  );
+  const found = recipeData.ingredients.find((ing) => ing.id === id);
+  const index = recipeData.ingredients.findIndex((ing) => ing.id === id);
+  const [value, setValue] = useState<null | string>(found?.name || "");
   const [isFocus, setIsFocus] = useState(false);
   const backgroundColor = useThemeColor({}, "background");
   const tint = useThemeColor({}, "tint");
@@ -69,12 +69,12 @@ export const DropdownComponent = ({
       category: "error",
     };
 
-    setRecipeData((prev: RecipeData) => {
+    setRecipeData((prev) => {
       const newIngredients = prev.ingredients.map((ing, i) =>
-        i === index
+        ing.id === id
           ? {
               ...ing,
-              brix: brix,
+              brix: Number(brix),
               category,
               name,
             }

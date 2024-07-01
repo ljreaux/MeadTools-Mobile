@@ -23,20 +23,22 @@ import { toSG } from "@/helpers/unitConverters";
 import { AntDesign } from "@expo/vector-icons";
 import CustomButton from "@/components/CustomButton";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
-  const { recipeData, setRecipeData } = useGlobalContext();
+  const { recipeData, setRecipeData, setSubmit } = useGlobalContext();
   const primaryIngredients = recipeData.ingredients.filter(
     (ingredient: IngredientType) => !ingredient.secondary
   );
   const secondaryIngredients = recipeData.ingredients.filter(
-    (ingredient: IngredientType) => ingredient.secondary
+    (ingredient: IngredientType) => ingredient.secondary === true
   );
 
   const addIngredientLine = (secondary: boolean) => {
-    setRecipeData((prev: RecipeData) => {
+    setRecipeData((prev) => {
+      console.log(secondaryIngredients);
       return {
         ...prev,
         ingredients: [
@@ -78,19 +80,19 @@ export default function HomeScreen() {
             </Text>
             <Text
               style={{ color: textColor }}
-              className="text-2xl py-4 text-center"
+              className="py-4 text-2xl text-center"
             >
               Primary Ingredients
             </Text>
             {primaryIngredients.map((item: IngredientType, i: number) => (
               <IngredientRow
-                index={i}
+                id={item.id}
                 ingredient={item}
                 key={i}
                 removeLine={removeLine}
               />
             ))}
-            <ThemedView className="py-8 mb-8 flex-row justify-center items-center">
+            <ThemedView className="flex-row items-center justify-center py-8 mb-8">
               <TouchableOpacity
                 className="mx-4"
                 onPress={() => addIngredientLine(false)}
@@ -128,19 +130,19 @@ export default function HomeScreen() {
             </ThemedView>
             <Text
               style={{ color: textColor }}
-              className="text-2xl py-4 text-center"
+              className="py-4 text-2xl text-center"
             >
               Secondary Ingredients
             </Text>
             {secondaryIngredients.map((item: IngredientType, i: number) => (
               <IngredientRow
-                index={i}
+                id={item.id}
                 ingredient={item}
                 key={i}
                 removeLine={removeLine}
               />
             ))}
-            <ThemedView className="py-8 flex-row justify-center items-center">
+            <ThemedView className="flex-row items-center justify-center py-8">
               <TouchableOpacity
                 className="mx-4"
                 onPress={() => addIngredientLine(true)}
@@ -179,7 +181,10 @@ export default function HomeScreen() {
             <CustomButton
               title="Submit"
               containerStyles="mb-24"
-              handlePress={() => router.push("/home/submit")}
+              handlePress={() => {
+                setSubmit(true);
+                router.push("/home/submit");
+              }}
             />
           </View>
         </TouchableWithoutFeedback>
@@ -189,15 +194,46 @@ export default function HomeScreen() {
 }
 
 const IngredientRow = ({
-  index,
+  id,
   ingredient,
   removeLine,
 }: {
-  index: number;
+  id: number;
   ingredient: IngredientType;
   removeLine: (index: number) => void;
 }) => {
   const { ingredients, recipeData, setRecipeData } = useGlobalContext();
+  const [textDetails, setTextDetails] = useState({
+    ingredients: recipeData.ingredients.map((ing) => {
+      return {
+        id: ing.id,
+        details: ing.details.map((det) => det.toString()),
+        brix: ing.brix.toString(),
+      };
+    }),
+  });
+
+  const setTextDetail = (text: string, id = 0, index: number | null) => {
+    setTextDetails(({ ingredients }) => {
+      if (index === null)
+        return {
+          ingredients: ingredients.map((ing) =>
+            id === ing.id ? { ...ing, brix: text } : ing
+          ),
+        };
+      const detailCopy = ingredients.find((ing) => ing.id === id)?.details || [
+        "error",
+        "error",
+      ];
+      detailCopy[index] = text;
+      return {
+        ingredients: ingredients.map((ing) =>
+          ing.id === id ? { ...ing, details: detailCopy } : ing
+        ),
+      };
+    });
+  };
+
   const ingredientsDropdown = ingredients.map((ing: IngredientListItem) => ({
     label: ing.name,
     value: ing.name,
@@ -207,10 +243,10 @@ const IngredientRow = ({
 
   const { units } = recipeData;
 
-  function setIndividual(index: number, ingredient: Partial<IngredientType>) {
+  function setIndividual(id: number, ingredient: Partial<IngredientType>) {
     setRecipeData((prev: RecipeData) => {
-      const newIngredient = prev.ingredients.map((ing, i) =>
-        i === index ? { ...ing, ...ingredient } : ing
+      const newIngredient = prev.ingredients.map((ing) =>
+        ing.id === id ? { ...ing, ...ingredient } : ing
       );
 
       return {
@@ -221,7 +257,7 @@ const IngredientRow = ({
   }
   const updateIngredientAmount = (
     text: string,
-    index: number,
+    id: number,
     detailIndex: number | null,
     ingredient: IngredientType
   ) => {
@@ -246,11 +282,11 @@ const IngredientRow = ({
           : Math.round((value / converter / toSG(ingredient.brix)) * 10000) /
             10000;
 
-      setIndividual(index, {
+      setIndividual(id, {
         details: detailCopy,
       });
     } else {
-      setIndividual(index, {
+      setIndividual(id, {
         brix: value,
         details: [
           ingredient.details[0],
@@ -261,12 +297,13 @@ const IngredientRow = ({
       });
     }
   };
-  const disabled = index < 4 && !ingredient.secondary;
+  const disabled = id < 4 && !ingredient.secondary;
+  const found = textDetails.ingredients.find((ing) => ing.id === id);
 
   return (
-    <ThemedView key={index}>
-      <View className="w-full flex-row items-center justify-between">
-        <Dropdown data={ingredientsDropdown} index={index} />
+    <ThemedView key={id}>
+      <View className="flex-row items-center justify-between w-full">
+        <Dropdown data={ingredientsDropdown} id={id} />
         <TouchableOpacity
           className="pr-6"
           onPress={() => removeLine(ingredient.id)}
@@ -279,52 +316,55 @@ const IngredientRow = ({
           />
         </TouchableOpacity>
       </View>
-      <View className="flex-row items-center w-screen h-16 justify-between">
-        <View className="mx-4 text-center items-center">
-          <ThemedText type="subtitle" className="font-semibold my-2">
+      <View className="flex-row items-center justify-between w-screen h-16">
+        <View className="items-center mx-4 text-center">
+          <ThemedText type="subtitle" className="my-2 font-semibold">
             Brix
           </ThemedText>
 
           <TextInput
-            className="flex-1 text-center text-base bg-white border-2 w-24 bg-black-100 rounded-2xl focus:border-secondary"
-            value={recipeData.ingredients[index].brix.toString()}
+            className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            value={found?.brix}
             keyboardType="numeric"
             placeholder="0"
-            onChangeText={(e) =>
-              updateIngredientAmount(e, index, null, ingredient)
-            }
+            onChangeText={(e) => {
+              setTextDetail(e, found?.id, null);
+              updateIngredientAmount(e, found?.id || 0, null, ingredient);
+            }}
           />
         </View>
-        <View className="mx-4 text-center items-center">
-          <ThemedText type="subtitle" className="font-semibold my-2">
+        <View className="items-center mx-4 text-center">
+          <ThemedText type="subtitle" className="my-2 font-semibold">
             Weight
           </ThemedText>
 
           <TextInput
-            className="flex-1 text-center text-base bg-white border-2 w-24 bg-black-100 rounded-2xl focus:border-secondary"
-            value={recipeData.ingredients[index].details[0].toString()}
+            className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            value={found?.details[0]}
             keyboardType="numeric"
             placeholder="0"
             placeholderTextColor={textColor}
-            onChangeText={(e) =>
-              updateIngredientAmount(e, index, 0, ingredient)
-            }
+            onChangeText={(e) => {
+              setTextDetail(e, found?.id, 0);
+              updateIngredientAmount(e, found?.id || 0, 0, ingredient);
+            }}
           />
         </View>
 
-        <View className="mx-4 text-center items-center">
-          <ThemedText type="subtitle" className="font-semibold my-2">
+        <View className="items-center mx-4 text-center">
+          <ThemedText type="subtitle" className="my-2 font-semibold">
             Volume
           </ThemedText>
 
           <TextInput
-            className="flex-1 text-center text-base bg-white border-2 w-24 bg-black-100 rounded-2xl focus:border-secondary"
-            value={recipeData.ingredients[index].details[1].toString()}
+            className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            value={found?.details[1]}
             keyboardType="numeric"
             placeholder="0"
-            onChangeText={(e) =>
-              updateIngredientAmount(e, index, 1, ingredient)
-            }
+            onChangeText={(e) => {
+              setTextDetail(e, found?.id, 1);
+              updateIngredientAmount(e, found?.id || 0, 1, ingredient);
+            }}
           />
         </View>
       </View>
