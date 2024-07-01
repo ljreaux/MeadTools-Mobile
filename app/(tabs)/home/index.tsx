@@ -6,10 +6,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { View } from "react-native";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { IngredientListItem } from "@/helpers/Ingredients";
 import {
@@ -23,7 +23,8 @@ import { toSG } from "@/helpers/unitConverters";
 import { AntDesign } from "@expo/vector-icons";
 import CustomButton from "@/components/CustomButton";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Dropdown as DefaultDropdown } from "react-native-element-dropdown";
 
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
@@ -65,9 +66,40 @@ export default function HomeScreen() {
     });
   }
 
+  const [value, setValue] = useState<{
+    weight: "lbs" | "kg";
+    volume: "gal" | "liter";
+  }>(recipeData.units);
+
+  useEffect(() => {
+    setRecipeData((prev) => ({
+      ...prev,
+      units: value,
+    }));
+  }, [value]);
+
+  const [isFocus, setIsFocus] = useState(false);
+  const tint = useThemeColor({}, "tint");
+  const renderLabel = (labelText: "Weight" | "Volume") => {
+    if (value || isFocus) {
+      return (
+        <Text
+          style={[
+            styles.label,
+            isFocus && { color: tint },
+            { backgroundColor, color: textColor },
+          ]}
+        >
+          {labelText} Units
+        </Text>
+      );
+    }
+    return null;
+  };
+
   return (
     <SafeAreaView
-      className={"h-screen items-center justify-center"}
+      className={"h-[calc(100%+3rem)]items-center justify-center py-12"}
       style={{
         backgroundColor,
       }}
@@ -78,6 +110,86 @@ export default function HomeScreen() {
             <Text className="text-4xl text-center" style={{ color: textColor }}>
               Recipe Builder
             </Text>
+            <View style={[styles.container, { backgroundColor }]}>
+              {renderLabel("Weight")}
+              <DefaultDropdown
+                style={[styles.dropdown, isFocus && { borderColor: tint }]}
+                placeholderStyle={[
+                  styles.placeholderStyle,
+                  { color: textColor },
+                ]}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: textColor, backgroundColor },
+                ]}
+                inputSearchStyle={[
+                  styles.inputSearchStyle,
+                  { backgroundColor, color: textColor },
+                ]}
+                itemContainerStyle={{ backgroundColor }}
+                itemTextStyle={{ color: textColor }}
+                iconStyle={styles.iconStyle}
+                data={[
+                  { label: "lbs", value: "lbs" },
+                  { label: "kg", value: "kg" },
+                ]}
+                search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                searchPlaceholder="Search..."
+                value={value.weight}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={({ value }) => {
+                  if (value === "lbs" || value === "kg")
+                    setValue((prev) => {
+                      return { ...prev, weight: value };
+                    });
+                  setIsFocus(false);
+                }}
+              />
+            </View>
+            <View style={[styles.container, { backgroundColor }]}>
+              {renderLabel("Volume")}
+              <DefaultDropdown
+                style={[styles.dropdown, isFocus && { borderColor: tint }]}
+                placeholderStyle={[
+                  styles.placeholderStyle,
+                  { color: textColor },
+                ]}
+                selectedTextStyle={[
+                  styles.selectedTextStyle,
+                  { color: textColor, backgroundColor },
+                ]}
+                inputSearchStyle={[
+                  styles.inputSearchStyle,
+                  { backgroundColor, color: textColor },
+                ]}
+                itemContainerStyle={{ backgroundColor }}
+                itemTextStyle={{ color: textColor }}
+                iconStyle={styles.iconStyle}
+                data={[
+                  { label: "gal", value: "gal" },
+                  { label: "liter", value: "liter" },
+                ]}
+                search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                searchPlaceholder="Search..."
+                value={value.volume}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={({ value }) => {
+                  if (value === "gal" || value === "liter")
+                    setValue((prev) => {
+                      return { ...prev, volume: value };
+                    });
+                  setIsFocus(false);
+                }}
+              />
+            </View>
             <Text
               style={{ color: textColor }}
               className="py-4 text-2xl text-center"
@@ -202,7 +314,13 @@ const IngredientRow = ({
   ingredient: IngredientType;
   removeLine: (index: number) => void;
 }) => {
-  const { ingredients, recipeData, setRecipeData } = useGlobalContext();
+  const {
+    ingredients,
+    recipeData,
+    setRecipeData,
+    textDetails,
+    setTextDetails,
+  } = useGlobalContext();
   const { units } = recipeData;
   const converter =
     units.weight === "kg" && units.volume === "liter"
@@ -212,15 +330,18 @@ const IngredientRow = ({
       : units.volume === "liter"
       ? 8.345 / 3.78541
       : 8.345;
-  const [textDetails, setTextDetails] = useState({
-    ingredients: recipeData.ingredients.map((ing) => {
-      return {
-        id: ing.id,
-        details: ing.details.map((det) => det.toFixed(3)),
-        brix: ing.brix.toString(),
-      };
-    }),
-  });
+
+  useEffect(() => {
+    setTextDetails({
+      ingredients: recipeData.ingredients.map((ing) => {
+        return {
+          id: ing.id,
+          details: ing.details.map((det) => det.toFixed(3)),
+          brix: ing.brix.toString(),
+        };
+      }),
+    });
+  }, [recipeData.units]);
 
   const createDetailCopy = (
     text: string,
@@ -347,6 +468,7 @@ const IngredientRow = ({
               setTextDetail(e, found?.id, null);
               updateIngredientAmount(e, found?.id || 0, null, ingredient);
             }}
+            selectTextOnFocus
           />
         </View>
         <View className="items-center mx-4 text-center">
@@ -364,6 +486,7 @@ const IngredientRow = ({
               setTextDetail(e, found?.id, 0);
               updateIngredientAmount(e, found?.id || 0, 0, ingredient);
             }}
+            selectTextOnFocus
           />
         </View>
 
@@ -381,6 +504,7 @@ const IngredientRow = ({
               setTextDetail(e, found?.id, 1);
               updateIngredientAmount(e, found?.id || 0, 1, ingredient);
             }}
+            selectTextOnFocus
           />
         </View>
       </View>
@@ -389,20 +513,41 @@ const IngredientRow = ({
 };
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+  container: {
+    padding: 16,
+    width: "80%",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  dropdown: {
+    height: 50,
+    width: "100%",
+    borderColor: "gray",
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  icon: {
+    marginRight: 5,
+  },
+  label: {
     position: "absolute",
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });

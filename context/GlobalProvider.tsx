@@ -20,6 +20,7 @@ import useAbv from "@/hooks/useAbv";
 type User = null | {
   token: string;
   refreshToken: string | null;
+  email: string;
 };
 interface ContextType {
   isLoggedIn: boolean;
@@ -41,6 +42,22 @@ interface ContextType {
   delle: number;
   totalPrimaryVolume: number;
   totalVolume: number;
+  textDetails: {
+    ingredients: {
+      id: number;
+      details: string[];
+      brix: string;
+    }[];
+  };
+  setTextDetails: Dispatch<
+    SetStateAction<{
+      ingredients: {
+        id: number;
+        details: string[];
+        brix: string;
+      }[];
+    }>
+  >;
 }
 
 const GlobalContext = createContext<any>(null);
@@ -176,7 +193,6 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (submit) {
-      console.log(noSecondaryBlend, recipeData.FG, secondaryBlend, blend);
       runBlends();
     }
     setSubmit(false);
@@ -217,6 +233,71 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [{ ABV, delle }, setABVDelle] = useState({ ABV: 0, delle: 0 });
 
+  const { units } = recipeData;
+  const [textDetails, setTextDetails] = useState({
+    ingredients: recipeData.ingredients.map((ing) => {
+      return {
+        id: ing.id,
+        details: ing.details.map((det) => det.toFixed(3)),
+        brix: ing.brix.toString(),
+      };
+    }),
+  });
+
+  useEffect(() => {
+    const multiplier = units.weight === "kg" ? 0.453592 : 2.20462;
+    setRecipeData((prev) => {
+      return {
+        ...prev,
+        ingredients: prev.ingredients.map((ing) => ({
+          ...ing,
+          details: [
+            Math.round(ing.details[0] * multiplier * 1000) / 1000,
+            ing.details[1],
+          ],
+        })),
+      };
+    });
+    setTextDetails((prev) => {
+      return {
+        ingredients: prev.ingredients.map((ing) => ({
+          ...ing,
+          details: [
+            (Number(ing.details[0]) * multiplier).toFixed(3),
+            ing.details[1],
+          ],
+        })),
+      };
+    });
+  }, [units.weight]);
+
+  useEffect(() => {
+    const multiplier = units.volume === "liter" ? 3.78541 : 0.264172;
+    setRecipeData((prev) => {
+      return {
+        ...prev,
+        ingredients: prev.ingredients.map((ing) => ({
+          ...ing,
+          details: [
+            ing.details[0],
+            Math.round(ing.details[1] * multiplier * 1000) / 1000,
+          ],
+        })),
+      };
+    });
+    setTextDetails((prev) => {
+      return {
+        ingredients: prev.ingredients.map((ing) => ({
+          ...ing,
+          details: [
+            ing.details[0],
+            (Number(ing.details[1]) * multiplier).toFixed(3),
+          ],
+        })),
+      };
+    });
+  }, [units.volume]);
+
   useEffect(() => {
     setABVDelle(calculateABV(ABVOBJ));
   }, [ABVOBJ.ABV]);
@@ -244,6 +325,8 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         totalPrimaryVolume:
           Math.round(noSecondaryBlend.totalVolume * 1000) / 1000,
         totalVolume: Math.round(blend.totalVolume * 1000) / 1000,
+        textDetails,
+        setTextDetails,
       }}
     >
       {children}

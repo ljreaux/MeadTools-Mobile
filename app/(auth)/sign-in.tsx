@@ -20,6 +20,7 @@ import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import { useBetterURL } from "@/hooks/useBetterUrl";
 
 const SignIn = () => {
   const redirectTo = makeRedirectUri();
@@ -50,7 +51,8 @@ const SignIn = () => {
     }
   };
 
-  const url = Linking.useURL();
+  const url = useBetterURL();
+  console.log(url, "line 56");
   if (url) createSessionFromUrl(url);
 
   const colorScheme = useColorScheme();

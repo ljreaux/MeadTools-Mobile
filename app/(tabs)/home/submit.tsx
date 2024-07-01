@@ -4,16 +4,34 @@ import { ThemedView } from "@/components/ThemedView";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, ScrollView, TextInput } from "react-native";
 
 const submit = () => {
   const backgroundColor = useThemeColor({}, "background");
-  const { recipeData, ABV, delle, blendFG, totalPrimaryVolume, totalVolume } =
-    useGlobalContext();
+  const {
+    recipeData,
+    setRecipeData,
+    ABV,
+    delle,
+    blendFG,
+    totalPrimaryVolume,
+    totalVolume,
+  } = useGlobalContext();
+  const [fgText, setFgText] = useState(recipeData.FG.toFixed(3));
+
+  const changeFG = (text: string) => {
+    setFgText(text);
+    let num = Number(text);
+    if (isNaN(num)) num = 0.996;
+    setRecipeData((prev) => ({
+      ...prev,
+      FG: num,
+    }));
+  };
   return (
     <SafeAreaView
-      className={"h-screen items-center justify-center"}
+      className={"h-[calc(100%+3rem)] items-center justify-center py-12"}
       style={{ backgroundColor }}
     >
       <ScrollView className="w-full h-full">
@@ -30,8 +48,12 @@ const submit = () => {
             </ThemedView>
             <ThemedView className="items-center text-center">
               <ThemedText className="text-2xl">Estimated FG:</ThemedText>
-              <TextInput className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary">
-                {recipeData.FG}
+              <TextInput
+                className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+                onChangeText={(text) => changeFG(text)}
+                selectTextOnFocus
+              >
+                {fgText}
               </TextInput>
             </ThemedView>
           </ThemedView>
@@ -62,14 +84,16 @@ const submit = () => {
                 Total Primary Volume:
               </ThemedText>
               <ThemedText className="text-2xl">
-                {totalPrimaryVolume} gal
+                {totalPrimaryVolume} {recipeData.units.volume}
               </ThemedText>
             </ThemedView>
           </ThemedView>
           <ThemedView className="flex-row justify-center">
             <ThemedView className="items-center text-center ">
               <ThemedText className="text-2xl">Total Actual Volume:</ThemedText>
-              <ThemedText className="text-2xl">{totalVolume} gal</ThemedText>
+              <ThemedText className="text-2xl">
+                {totalVolume} {recipeData.units.volume}
+              </ThemedText>
             </ThemedView>
           </ThemedView>
         </ThemedView>
