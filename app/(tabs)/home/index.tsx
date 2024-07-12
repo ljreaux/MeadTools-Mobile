@@ -25,6 +25,8 @@ import CustomButton from "@/components/CustomButton";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Dropdown as DefaultDropdown } from "react-native-element-dropdown";
+import { useTranslation } from "react-i18next";
+import lodash from "lodash";
 
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
@@ -77,20 +79,20 @@ export default function HomeScreen() {
       units: value,
     }));
   }, [value]);
-
-  const [isFocus, setIsFocus] = useState(false);
+  const { t } = useTranslation();
+  const [isFocus, setIsFocus] = useState({ weight: false, volume: false });
   const tint = useThemeColor({}, "tint");
-  const renderLabel = (labelText: "Weight" | "Volume") => {
-    if (value || isFocus) {
+  const renderLabel = (labelText: "weight" | "volume") => {
+    if (value[labelText] || isFocus[labelText]) {
       return (
         <Text
           style={[
             styles.label,
-            isFocus && { color: tint },
+            isFocus[labelText] && { color: tint },
             { backgroundColor, color: textColor },
           ]}
         >
-          {labelText} Units
+          {labelText.charAt(0).toUpperCase() + labelText.substring(1)} Units
         </Text>
       );
     }
@@ -108,93 +110,97 @@ export default function HomeScreen() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
             <Text className="text-4xl text-center" style={{ color: textColor }}>
-              Recipe Builder
+              {t("recipeBuilder.homeHeading")}
             </Text>
-            <View style={[styles.container, { backgroundColor }]}>
-              {renderLabel("Weight")}
-              <DefaultDropdown
-                style={[styles.dropdown, isFocus && { borderColor: tint }]}
-                placeholderStyle={[
-                  styles.placeholderStyle,
-                  { color: textColor },
-                ]}
-                selectedTextStyle={[
-                  styles.selectedTextStyle,
-                  { color: textColor, backgroundColor },
-                ]}
-                inputSearchStyle={[
-                  styles.inputSearchStyle,
-                  { backgroundColor, color: textColor },
-                ]}
-                itemContainerStyle={{ backgroundColor }}
-                itemTextStyle={{ color: textColor }}
-                iconStyle={styles.iconStyle}
-                data={[
-                  { label: "lbs", value: "lbs" },
-                  { label: "kg", value: "kg" },
-                ]}
-                search
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                searchPlaceholder="Search..."
-                value={value.weight}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={({ value }) => {
-                  if (value === "lbs" || value === "kg")
-                    setValue((prev) => {
-                      return { ...prev, weight: value };
-                    });
-                  setIsFocus(false);
-                }}
-              />
-            </View>
-            <View style={[styles.container, { backgroundColor }]}>
-              {renderLabel("Volume")}
-              <DefaultDropdown
-                style={[styles.dropdown, isFocus && { borderColor: tint }]}
-                placeholderStyle={[
-                  styles.placeholderStyle,
-                  { color: textColor },
-                ]}
-                selectedTextStyle={[
-                  styles.selectedTextStyle,
-                  { color: textColor, backgroundColor },
-                ]}
-                inputSearchStyle={[
-                  styles.inputSearchStyle,
-                  { backgroundColor, color: textColor },
-                ]}
-                itemContainerStyle={{ backgroundColor }}
-                itemTextStyle={{ color: textColor }}
-                iconStyle={styles.iconStyle}
-                data={[
-                  { label: "gal", value: "gal" },
-                  { label: "liter", value: "liter" },
-                ]}
-                search
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                searchPlaceholder="Search..."
-                value={value.volume}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={({ value }) => {
-                  if (value === "gal" || value === "liter")
-                    setValue((prev) => {
-                      return { ...prev, volume: value };
-                    });
-                  setIsFocus(false);
-                }}
-              />
+            <View className="flex flex-row items-center w-screen">
+              <View style={[styles.container, { backgroundColor }]}>
+                {renderLabel("weight")}
+                <DefaultDropdown
+                  style={[
+                    styles.dropdown,
+                    isFocus.weight && { borderColor: tint },
+                  ]}
+                  placeholderStyle={[
+                    styles.placeholderStyle,
+                    { color: textColor },
+                  ]}
+                  selectedTextStyle={[
+                    styles.selectedTextStyle,
+                    { color: textColor, backgroundColor },
+                  ]}
+                  itemContainerStyle={{
+                    backgroundColor,
+                  }}
+                  itemTextStyle={{ color: textColor }}
+                  data={[
+                    { label: t("LBS"), value: "lbs" },
+                    { label: t("KG"), value: "kg" },
+                  ]}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={value.weight}
+                  onFocus={() =>
+                    setIsFocus((prev) => ({ ...prev, weight: true }))
+                  }
+                  onBlur={() =>
+                    setIsFocus((prev) => ({ ...prev, weight: false }))
+                  }
+                  onChange={({ value }) => {
+                    if (value === "lbs" || value === "kg")
+                      setValue((prev) => {
+                        return { ...prev, weight: value };
+                      });
+                    setIsFocus((prev) => ({ ...prev, weight: false }));
+                  }}
+                />
+              </View>
+              <View style={[styles.container, { backgroundColor }]}>
+                {renderLabel("volume")}
+                <DefaultDropdown
+                  style={[
+                    styles.dropdown,
+                    isFocus.volume && { borderColor: tint },
+                  ]}
+                  placeholderStyle={[
+                    styles.placeholderStyle,
+                    { color: textColor },
+                  ]}
+                  selectedTextStyle={[
+                    styles.selectedTextStyle,
+                    { color: textColor, backgroundColor },
+                  ]}
+                  itemContainerStyle={{ backgroundColor }}
+                  itemTextStyle={{ color: textColor }}
+                  data={[
+                    { label: t("GAL"), value: "gal" },
+                    { label: t("LIT"), value: "liter" },
+                  ]}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={value.volume}
+                  onFocus={() =>
+                    setIsFocus((prev) => ({ ...prev, volume: true }))
+                  }
+                  onBlur={() =>
+                    setIsFocus((prev) => ({ ...prev, volume: false }))
+                  }
+                  onChange={({ value }) => {
+                    if (value === "gal" || value === "liter")
+                      setValue((prev) => {
+                        return { ...prev, volume: value };
+                      });
+                    setIsFocus((prev) => ({ ...prev, volume: false }));
+                  }}
+                />
+              </View>
             </View>
             <Text
               style={{ color: textColor }}
               className="py-4 text-2xl text-center"
             >
-              Primary Ingredients
+              {t("PDF.primary")}
             </Text>
             {primaryIngredients.map((item: IngredientType, i: number) => (
               <IngredientRow
@@ -244,7 +250,7 @@ export default function HomeScreen() {
               style={{ color: textColor }}
               className="py-4 text-2xl text-center"
             >
-              Secondary Ingredients
+              {t("PDF.secondary")}
             </Text>
             {secondaryIngredients.map((item: IngredientType, i: number) => (
               <IngredientRow
@@ -291,7 +297,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </ThemedView>
             <CustomButton
-              title="Submit"
+              title={`${t("recipeBuilder.submit")}`}
               containerStyles="mb-24"
               handlePress={() => {
                 setSubmit(true);
@@ -386,10 +392,15 @@ const IngredientRow = ({
     });
   };
 
-  const ingredientsDropdown = ingredients.map((ing: IngredientListItem) => ({
-    label: ing.name,
-    value: ing.name,
-  }));
+  const { t } = useTranslation();
+
+  const ingredientsDropdown = ingredients.map((ing: IngredientListItem) => {
+    const ingredientDisplay = lodash.camelCase(ing.name);
+    return {
+      label: t(`${ingredientDisplay}`),
+      value: ing.name,
+    };
+  });
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
 
@@ -456,7 +467,7 @@ const IngredientRow = ({
       <View className="flex-row items-center justify-between w-screen h-16">
         <View className="items-center mx-4 text-center">
           <ThemedText type="subtitle" className="my-2 font-semibold">
-            Brix
+            {t("BRIX")}
           </ThemedText>
 
           <TextInput
@@ -473,7 +484,7 @@ const IngredientRow = ({
         </View>
         <View className="items-center mx-4 text-center">
           <ThemedText type="subtitle" className="my-2 font-semibold">
-            Weight
+            {t("recipeBuilder.labels.weight")}
           </ThemedText>
 
           <TextInput
@@ -492,7 +503,7 @@ const IngredientRow = ({
 
         <View className="items-center mx-4 text-center">
           <ThemedText type="subtitle" className="my-2 font-semibold">
-            Volume
+            {t("recipeBuilder.labels.volume")}
           </ThemedText>
 
           <TextInput
@@ -514,8 +525,10 @@ const IngredientRow = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    width: "80%",
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    maxWidth: "50%",
+    width: "100%",
   },
   dropdown: {
     height: 50,
@@ -524,9 +537,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-  },
-  icon: {
-    marginRight: 5,
   },
   label: {
     position: "absolute",
@@ -540,14 +550,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
     fontSize: 16,
   },
 });

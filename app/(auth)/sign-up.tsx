@@ -1,4 +1,10 @@
-import { ScrollView, Alert, View, useColorScheme } from "react-native";
+import {
+  ScrollView,
+  Alert,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
@@ -14,10 +20,11 @@ import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import { TouchableOpacity } from "react-native";
 
 const SignUp = () => {
   const redirectTo = makeRedirectUri();
-
+  const { width } = useWindowDimensions();
   const createSessionFromUrl = async (url: string) => {
     const { params } = QueryParams.getQueryParams(url);
 
@@ -47,7 +54,7 @@ const SignUp = () => {
   const url = Linking.useURL();
   if (url) createSessionFromUrl(url);
   const colorScheme = useColorScheme();
-  const Button =
+  const GoogleButton =
     colorScheme === "light"
       ? ({ width, height }: { width: number; height: number }) => (
           <LightButton width={width} height={height} />
@@ -90,11 +97,11 @@ const SignUp = () => {
   };
 
   return (
-    <SafeAreaView className="h-full">
+    <View className="h-full">
       <ScrollView className="h-full">
         <ThemedView className="w-full justify-center min-h-[100vh] px-4">
           <ThemedText className="text-3xl text-center">
-            Log in to Meadtools
+            Sign up for Meadtools
           </ThemedText>
           <FormField
             title="Email"
@@ -117,22 +124,26 @@ const SignUp = () => {
           />
           <View className="flex items-center justify-center w-full">
             <ThemedText className="pt-4 text-3xl font-bold">OR</ThemedText>
-            <Button width={400} height={200} />
           </View>
+          <TouchableOpacity onPress={performOAuth}>
+            <GoogleButton width={width * 0.9} height={200} />
+          </TouchableOpacity>
           <ThemedView className="flex-row justify-center gap-2 pt-5">
             <ThemedText className="text-lg text-gray-100 font-pregular">
               Already have an account?
             </ThemedText>
-            <Link
-              href="/sign-in"
-              className="text-lg font-psemibold text-secondary-200"
-            >
-              Sign In
-            </Link>
+            <ThemedText type="link">
+              <Link
+                href="/sign-in"
+                className="text-lg font-psemibold text-secondary-200"
+              >
+                Sign In
+              </Link>
+            </ThemedText>
           </ThemedView>
         </ThemedView>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

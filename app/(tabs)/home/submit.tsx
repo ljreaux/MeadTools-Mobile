@@ -100,7 +100,7 @@ const submit = () => {
         <CustomButton
           title="Go Back"
           containerStyles="mt-12"
-          handlePress={() => router.push("/home")}
+          handlePress={() => router.back()}
         />
       </ScrollView>
     </SafeAreaView>

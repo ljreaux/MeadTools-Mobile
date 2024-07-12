@@ -4,6 +4,7 @@ import {
   View,
   useColorScheme,
   TouchableOpacity,
+  useWindowDimensions,
 } from "react-native";
 import React, { useState } from "react";
 import { Link, router } from "expo-router";
@@ -24,6 +25,7 @@ import { useBetterURL } from "@/hooks/useBetterUrl";
 
 const SignIn = () => {
   const redirectTo = makeRedirectUri();
+  const { width } = useWindowDimensions();
 
   const createSessionFromUrl = async (url: string) => {
     const { params } = QueryParams.getQueryParams(url);
@@ -56,7 +58,7 @@ const SignIn = () => {
   if (url) createSessionFromUrl(url);
 
   const colorScheme = useColorScheme();
-  const Button =
+  const GoogleButton =
     colorScheme === "light"
       ? ({ width, height }: { width: number; height: number }) => (
           <LightButton width={width} height={height} />
@@ -99,7 +101,7 @@ const SignIn = () => {
   };
 
   return (
-    <SafeAreaView className="h-full">
+    <View className="h-full">
       <ScrollView className="h-full">
         <ThemedView className="w-full justify-center min-h-[100vh] px-4">
           <ThemedText className="text-3xl text-center">
@@ -127,23 +129,25 @@ const SignIn = () => {
           <View className="flex items-center justify-center w-full">
             <ThemedText className="pt-4 text-3xl font-bold">OR</ThemedText>
             <TouchableOpacity onPress={performOAuth}>
-              <Button width={400} height={200} />
+              <GoogleButton width={width * 0.9} height={200} />
             </TouchableOpacity>
           </View>
           <ThemedView className="flex-row justify-center gap-2 pt-5">
             <ThemedText className="text-lg text-gray-100 font-pregular">
               Don't have account?
             </ThemedText>
-            <Link
-              href="/sign-up"
-              className="text-lg font-psemibold text-secondary-200"
-            >
-              Sign Up
-            </Link>
+            <ThemedText type="link">
+              <Link
+                href="/sign-up"
+                className="text-lg font-psemibold text-secondary-200"
+              >
+                Sign Up
+              </Link>
+            </ThemedText>
           </ThemedView>
         </ThemedView>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -8,6 +8,8 @@ module.exports = {
       colors: {
         primary: "",
         secondary: "hsl(38, 54%, 56%)",
+        textInput: "hsl(36, 16%, 82%)",
+        textBorder: "hsl(210, 13%, 35%)",
       },
     },
   },

@@ -30,7 +30,7 @@ const FormField = ({
   return (
     <View className={`space-y-2 ${otherStyles}`}>
       <ThemedText className="text-base">{title}</ThemedText>
-      <ThemedView className="flex-row items-center w-full h-16 px-4 bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary">
+      <ThemedView className="flex-row items-center w-full h-16 px-4 border-2 bg-textInput border-textBorder rounded-2xl focus:border-secondary">
         <TextInput
           className="flex-1 text-base "
           onChangeText={handleChangeText}
