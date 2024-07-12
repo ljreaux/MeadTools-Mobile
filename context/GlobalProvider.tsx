@@ -22,13 +22,19 @@ type User = null | {
   refreshToken: string | null;
   email: string;
 };
+
+type UserData = {
+  email: string;
+  id: number;
+  recipes: { id: number; user_id: number; name: string }[];
+};
 interface ContextType {
   isLoggedIn: boolean;
   setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
   user: User;
   setUser: Dispatch<SetStateAction<User>>;
-  userData: unknown;
-  setUserData: Dispatch<SetStateAction<unknown>>;
+  userData: UserData;
+  setUserData: Dispatch<SetStateAction<UserData>>;
   loading: boolean;
   ingredients: IngredientListItem[];
   setIngredients: Dispatch<SetStateAction<IngredientListItem>>;
@@ -301,6 +307,16 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setABVDelle(calculateABV(ABVOBJ));
   }, [ABVOBJ.ABV]);
+
+  useEffect(() => {
+    setRecipeData((prev) => ({
+      ...prev,
+      units: {
+        weight: isMetric ? "kg" : "lbs",
+        volume: isMetric ? "liter" : "gal",
+      },
+    }));
+  }, [isMetric]);
 
   return (
     <GlobalContext.Provider

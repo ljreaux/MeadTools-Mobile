@@ -5,7 +5,6 @@ const HomeLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="submit" options={{ headerShown: false }} />
     </Stack>
   );
 };

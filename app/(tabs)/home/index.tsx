@@ -31,7 +31,8 @@ import lodash from "lodash";
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
-  const { recipeData, setRecipeData, setSubmit } = useGlobalContext();
+  const { recipeData, setRecipeData, setSubmit, isMetric } = useGlobalContext();
+
   const primaryIngredients = recipeData.ingredients.filter(
     (ingredient: IngredientType) => !ingredient.secondary
   );
@@ -41,7 +42,6 @@ export default function HomeScreen() {
 
   const addIngredientLine = (secondary: boolean) => {
     setRecipeData((prev) => {
-      console.log(secondaryIngredients);
       return {
         ...prev,
         ingredients: [
@@ -72,6 +72,10 @@ export default function HomeScreen() {
     weight: "lbs" | "kg";
     volume: "gal" | "liter";
   }>(recipeData.units);
+
+  useEffect(() => {
+    setValue(recipeData.units);
+  }, [isMetric]);
 
   useEffect(() => {
     setRecipeData((prev) => ({

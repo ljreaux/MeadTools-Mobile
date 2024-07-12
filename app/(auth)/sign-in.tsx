@@ -54,7 +54,6 @@ const SignIn = () => {
   };
 
   const url = useBetterURL();
-  console.log(url, "line 56");
   if (url) createSessionFromUrl(url);
 
   const colorScheme = useColorScheme();
