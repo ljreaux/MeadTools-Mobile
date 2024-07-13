@@ -99,7 +99,7 @@ const Brix = () => {
             setIsFocus(true);
           }}
         />
-        <ThemedText type="defaultSemiBold" className="text-xl">
+        <ThemedText type="subtitle" className="text-3xl">
           {displayString}
         </ThemedText>
       </ThemedView>
