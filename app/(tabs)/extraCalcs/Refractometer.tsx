@@ -56,11 +56,11 @@ const Refractometer = () => {
       calcSg: actualFg,
       calcBrix: toBrix(actualFg),
     }));
-    // setTextInputs((prev) => ({
-    //   ...prev,
-    //   calcSg: actualFg.toString(),
-    //   calcBrix: toBrix(actualFg).toString(),
-    // }));
+    setTextInputs((prev) => ({
+      ...prev,
+      calcSg: actualFg.toString(),
+      calcBrix: toBrix(actualFg).toString(),
+    }));
   }, [refrac.cf, refrac.og, refrac.fgInBrix, refrac.units]);
 
   useEffect(() => {
