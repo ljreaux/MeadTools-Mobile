@@ -117,10 +117,13 @@ const Refractometer = () => {
             }}
           />
           <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: tint }]}
-            placeholderStyle={[styles.placeholderStyle, { color: textColor }]}
+            style={[dropdownStyles.dropdown, isFocus && { borderColor: tint }]}
+            placeholderStyle={[
+              dropdownStyles.placeholderStyle,
+              { color: textColor },
+            ]}
             selectedTextStyle={[
-              styles.selectedTextStyle,
+              dropdownStyles.selectedTextStyle,
               { color: textColor, backgroundColor },
             ]}
             itemContainerStyle={{
@@ -173,7 +176,7 @@ const Refractometer = () => {
 
 export default Refractometer;
 
-const styles = StyleSheet.create({
+export const dropdownStyles = StyleSheet.create({
   container: {
     paddingVertical: 16,
     paddingHorizontal: 8,
