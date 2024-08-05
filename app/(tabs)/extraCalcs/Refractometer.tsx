@@ -1,5 +1,5 @@
-import { View, Text, TouchableWithoutFeedback } from "react-native";
-import React, { createFactory, useEffect, useState } from "react";
+import { TouchableWithoutFeedback } from "react-native";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toBrix, toSG } from "@/helpers/unitConverters";
 import useAbv from "@/hooks/useAbv";
@@ -103,7 +103,7 @@ const Refractometer = () => {
             }}
           />
         </ThemedView>
-        <ThemedView className="flex-row w-11/12 items-center justify-center">
+        <ThemedView className="flex-row items-center justify-center w-11/12">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("ogLabel")}
           </ThemedText>
@@ -146,7 +146,7 @@ const Refractometer = () => {
             }}
           />
         </ThemedView>
-        <ThemedView className="flex-row w-11/12 items-center justify-center">
+        <ThemedView className="flex-row items-center justify-center w-11/12">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("fgInBrix")}
           </ThemedText>
@@ -185,7 +185,6 @@ export const dropdownStyles = StyleSheet.create({
   },
   dropdown: {
     height: 50,
-    // width: "30%",
     flex: 1,
     borderColor: "gray",
     borderWidth: 0.5,

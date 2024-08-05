@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { TextInput, TouchableWithoutFeedback } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useAbv from "@/hooks/useAbv";
@@ -70,5 +64,3 @@ const AbvCalculator = () => {
 };
 
 export default AbvCalculator;
-
-const styles = StyleSheet.create({});

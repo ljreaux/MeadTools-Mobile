@@ -56,7 +56,7 @@ const Brix = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ThemedView className="items-center justify-center flex-1 pt-10">
-        <ThemedText className="py-4 text-center" type="title">
+        <ThemedText type="title" className="px-2 py-4 text-center">
           {t("brixHeading")}
         </ThemedText>
         <ThemedView className="flex-row w-11/12">
