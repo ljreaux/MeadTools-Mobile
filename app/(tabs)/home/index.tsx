@@ -238,13 +238,13 @@ export default function HomeScreen() {
                     primaryIngredients[primaryIngredients.length - 1].id
                   )
                 }
-                disabled={primaryIngredients.length < 5}
+                disabled={primaryIngredients.length < 3}
               >
                 <AntDesign
                   name="minussquare"
                   size={36}
                   color={
-                    primaryIngredients.length < 5
+                    primaryIngredients.length < 3
                       ? `${backgroundColor}`
                       : `${textColor}`
                   }
@@ -450,7 +450,7 @@ const IngredientRow = ({
       });
     }
   };
-  const disabled = id < 4 && !ingredient.secondary;
+  const disabled = id < 3 && !ingredient.secondary;
   const found = textDetails.ingredients.find((ing) => ing.id === id);
 
   return (
