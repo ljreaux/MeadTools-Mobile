@@ -9,6 +9,7 @@ import { Keyboard } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Dropdown as DefaultDropdown } from "react-native-element-dropdown";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import CustomInput from "@/components/CustomInput";
 
 export interface Brix {
   value: number;
@@ -59,12 +60,11 @@ const Brix = () => {
         <ThemedText type="title" className="px-2 py-4 text-center">
           {t("brixHeading")}
         </ThemedText>
-        <ThemedView className="flex-row w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("gravityLabel")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={stringValue}
             onChangeText={setStringValue}

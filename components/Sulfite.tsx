@@ -12,6 +12,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
 import { Dropdown as DefaultDropdown } from "react-native-element-dropdown";
+import CustomInput from "./CustomInput";
 
 const Sulfite = () => {
   const { t } = useTranslation();
@@ -59,18 +60,17 @@ const Sulfite = () => {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      className="w-full items-center justify-center"
+      className="items-center justify-center w-full"
     >
       <ThemedView>
         <ThemedText className="py-4 text-center" type="title">
           {t("sulfiteHeading")}
         </ThemedText>
-        <ThemedView className="flex-row w-11/12 justify-center items-center space-x-2">
+        <ThemedView className="flex-row items-center justify-center w-11/12 space-x-2">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("batchSize")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={sulfiteText.batchSize}
             onChangeText={(text) => {
@@ -103,12 +103,11 @@ const Sulfite = () => {
             }}
           />
         </ThemedView>
-        <ThemedView className="flex-row w-11/12 justify-center items-center space-x-2">
+        <ThemedView className="flex-row items-center justify-center w-11/12 space-x-2">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("desiredPpm")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={sulfiteText.ppm}
             onChangeText={(text) => {
@@ -117,13 +116,13 @@ const Sulfite = () => {
           />
         </ThemedView>
         <ThemedView className="my-4">
-          <ThemedText className="text-center text-2xl">
+          <ThemedText className="text-2xl text-center">
             {Math.round(sulfiteAmount * 10000) / 10000}g {t("kMeta")}
           </ThemedText>
-          <ThemedText className="text-center text-2xl">
+          <ThemedText className="text-2xl text-center">
             {t("accountPage.or")}
           </ThemedText>
-          <ThemedText className="text-center text-2xl">
+          <ThemedText className="text-2xl text-center">
             {Math.round(campden * 10) / 10} {t("list.campden")}
           </ThemedText>
         </ThemedView>

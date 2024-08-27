@@ -14,6 +14,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { TextInput } from "react-native-gesture-handler";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Dropdown } from "react-native-element-dropdown";
+import CustomInput from "@/components/CustomInput";
 
 const TempCorrection = () => {
   const { t } = useTranslation();
@@ -73,12 +74,11 @@ const TempCorrection = () => {
         <ThemedText className="py-4 text-center" type="title">
           {t("tempCorrectionHeading")}
         </ThemedText>
-        <ThemedView className="flex-row w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("measuredSG")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={textInputs.measured}
             onChangeText={(text) => {
@@ -89,13 +89,13 @@ const TempCorrection = () => {
             {Math.round(toBrix(tempObj.measured) * 100) / 100} {t("Brix")}
           </ThemedText>
         </ThemedView>
-        <ThemedView className="flex-row w-11/12 items-center justify-center">
-          <ThemedText type="defaultSemiBold" className="text-xl">
+        <ThemedView className="flex-row items-center justify-center w-11/12">
+          <ThemedText type="defaultSemiBold" className="mr-2 text-xl ">
             {t("curTemp")}
           </ThemedText>
 
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
+            style={{ flex: 1 }}
             keyboardType="numeric"
             value={textInputs.curTemp}
             onChangeText={(text) => {
@@ -129,12 +129,11 @@ const TempCorrection = () => {
             }}
           />
         </ThemedView>
-        <ThemedView className="flex-row w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("calTemp")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={textInputs.calTemp}
             onChangeText={(text) => {

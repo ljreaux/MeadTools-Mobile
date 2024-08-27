@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/useThemeColor";
 import useBlend, { NumArray } from "@/hooks/useBlend";
 import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
 
 const BlendingCalc = () => {
   const { t } = useTranslation();
@@ -40,12 +40,12 @@ const BlendingCalc = () => {
           {t("blendingHeading")}
         </ThemedText>
         <ThemedView className="my-4 space-y-2">
-          <ThemedView className="flex-row w-11/12">
+          <ThemedView className="flex-row items-center justify-between w-11/12">
             <ThemedText type="defaultSemiBold" className="text-xl">
               {t("valOne")}
             </ThemedText>
-            <TextInput
-              className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            <CustomInput
+              style={{ maxWidth: 150 }}
               keyboardType="numeric"
               value={inputText[0][0]}
               onChangeText={(text) => {
@@ -53,12 +53,12 @@ const BlendingCalc = () => {
               }}
             />
           </ThemedView>
-          <ThemedView className="flex-row w-11/12">
+          <ThemedView className="flex-row items-center justify-between w-11/12">
             <ThemedText type="defaultSemiBold" className="text-xl">
               {t("volOne")}
             </ThemedText>
-            <TextInput
-              className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            <CustomInput
+              style={{ maxWidth: 150 }}
               keyboardType="numeric"
               value={inputText[0][1]}
               onChangeText={(text) => {
@@ -68,12 +68,12 @@ const BlendingCalc = () => {
           </ThemedView>
         </ThemedView>
         <ThemedView className="my-4 space-y-2">
-          <ThemedView className="flex-row w-11/12">
+          <ThemedView className="flex-row items-center justify-between w-11/12">
             <ThemedText type="defaultSemiBold" className="text-xl">
               {t("valTwo")}
             </ThemedText>
-            <TextInput
-              className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            <CustomInput
+              style={{ maxWidth: 150 }}
               keyboardType="numeric"
               value={inputText[1][0]}
               onChangeText={(text) => {
@@ -81,12 +81,12 @@ const BlendingCalc = () => {
               }}
             />
           </ThemedView>
-          <ThemedView className="flex-row w-11/12">
+          <ThemedView className="flex-row items-center justify-between w-11/12">
             <ThemedText type="defaultSemiBold" className="text-xl">
               {t("volTwo")}
             </ThemedText>
-            <TextInput
-              className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+            <CustomInput
+              style={{ maxWidth: 150 }}
               keyboardType="numeric"
               value={inputText[1][1]}
               onChangeText={(text) => {

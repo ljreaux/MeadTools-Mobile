@@ -27,6 +27,7 @@ import React, { useEffect, useState } from "react";
 import { Dropdown as DefaultDropdown } from "react-native-element-dropdown";
 import { useTranslation } from "react-i18next";
 import lodash from "lodash";
+import CustomInput from "@/components/CustomInput";
 
 export default function HomeScreen() {
   const backgroundColor = useThemeColor({}, "background");
@@ -468,14 +469,14 @@ const IngredientRow = ({
           />
         </TouchableOpacity>
       </View>
-      <View className="flex-row items-center justify-between w-screen h-16">
+      <View className="flex-row items-center justify-between w-screen">
         <View className="items-center mx-4 text-center">
           <ThemedText type="subtitle" className="my-2 font-semibold">
             {t("BRIX")}
           </ThemedText>
 
-          <TextInput
-            className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
+            style={{ minWidth: 90 }}
             value={found?.brix}
             keyboardType="numeric"
             placeholder="0"
@@ -483,7 +484,6 @@ const IngredientRow = ({
               setTextDetail(e, found?.id, null);
               updateIngredientAmount(e, found?.id || 0, null, ingredient);
             }}
-            selectTextOnFocus
           />
         </View>
         <View className="items-center mx-4 text-center">
@@ -491,8 +491,8 @@ const IngredientRow = ({
             {t("recipeBuilder.labels.weight")}
           </ThemedText>
 
-          <TextInput
-            className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
+            style={{ minWidth: 90 }}
             value={found?.details[0]}
             keyboardType="numeric"
             placeholder="0"
@@ -501,7 +501,6 @@ const IngredientRow = ({
               setTextDetail(e, found?.id, 0);
               updateIngredientAmount(e, found?.id || 0, 0, ingredient);
             }}
-            selectTextOnFocus
           />
         </View>
 
@@ -510,8 +509,8 @@ const IngredientRow = ({
             {t("recipeBuilder.labels.volume")}
           </ThemedText>
 
-          <TextInput
-            className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
+            style={{ minWidth: 90 }}
             value={found?.details[1]}
             keyboardType="numeric"
             placeholder="0"
@@ -519,7 +518,6 @@ const IngredientRow = ({
               setTextDetail(e, found?.id, 1);
               updateIngredientAmount(e, found?.id || 0, 1, ingredient);
             }}
-            selectTextOnFocus
           />
         </View>
       </View>

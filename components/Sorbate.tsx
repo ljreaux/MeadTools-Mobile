@@ -6,6 +6,7 @@ import { ThemedText } from "./ThemedText";
 import { TextInput } from "react-native-gesture-handler";
 import { Dropdown as DefaultDropdown } from "react-native-element-dropdown";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import CustomInput from "./CustomInput";
 
 const Sorbate = () => {
   const { t } = useTranslation();
@@ -51,12 +52,11 @@ const Sorbate = () => {
       <ThemedText className="py-4 text-center" type="title">
         {t("sorbateHeading")}
       </ThemedText>
-      <ThemedView className="flex-row w-11/12 justify-center items-center space-x-2">
+      <ThemedView className="flex-row items-center justify-center w-11/12 space-x-2">
         <ThemedText type="defaultSemiBold" className="text-xl">
           {t("batchSize")}
         </ThemedText>
-        <TextInput
-          className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+        <CustomInput
           keyboardType="numeric"
           value={sorbateText.batchSize}
           onChangeText={(text) => {
@@ -89,12 +89,11 @@ const Sorbate = () => {
           }}
         />
       </ThemedView>
-      <ThemedView className="flex-row w-11/12 justify-center items-center space-x-2">
+      <ThemedView className="flex-row items-center justify-between w-11/12 px-2 space-x-2">
         <ThemedText type="defaultSemiBold" className="text-xl">
           {t("ABV")}:
         </ThemedText>
-        <TextInput
-          className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+        <CustomInput
           keyboardType="numeric"
           value={sorbateText.abv}
           onChangeText={(text) => {
@@ -102,7 +101,7 @@ const Sorbate = () => {
           }}
         />
       </ThemedView>
-      <ThemedText className="text-center text-2xl my-4">
+      <ThemedText className="my-4 text-2xl text-center">
         {Math.round(sorbateAmount * 1000) / 1000}g {t("kSorb")}
       </ThemedText>
     </ThemedView>
@@ -113,7 +112,7 @@ export default Sorbate;
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 16,
+    paddingVertical: 12,
     paddingHorizontal: 8,
     maxWidth: "50%",
     width: "100%",

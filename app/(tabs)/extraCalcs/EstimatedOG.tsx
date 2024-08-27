@@ -8,6 +8,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { TextInput } from "react-native";
 import { toBrix } from "@/helpers/unitConverters";
 import AbvLine from "@/components/AbvLine";
+import CustomInput from "@/components/CustomInput";
 
 interface Gravity {
   fgh: number;
@@ -47,12 +48,12 @@ const EstimatedOG = () => {
         <ThemedText className="py-4 text-center" type="title">
           {t("ogHeading")}
         </ThemedText>
-        <ThemedView className="flex-row w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12 my-1">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("hydrometerFG")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
+            style={{ maxWidth: 100 }}
             keyboardType="numeric"
             value={gravityText.fgh}
             onChangeText={(text) =>
@@ -60,12 +61,12 @@ const EstimatedOG = () => {
             }
           />
         </ThemedView>
-        <ThemedView className="flex-row w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12 my-1">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("refractometerFG")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
+            style={{ maxWidth: 100 }}
             keyboardType="numeric"
             value={gravityText.fgr}
             onChangeText={(text) =>

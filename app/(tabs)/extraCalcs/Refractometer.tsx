@@ -11,6 +11,7 @@ import { StyleSheet } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Dropdown } from "react-native-element-dropdown";
 import AbvLine from "@/components/AbvLine";
+import CustomInput from "@/components/CustomInput";
 
 function refracCalc(ogBr: number, fgBr: number, corFac: number) {
   return -0.002349 * (ogBr / corFac) + 0.006276 * (fgBr / corFac) + 1;
@@ -90,12 +91,11 @@ const Refractometer = () => {
         <ThemedText className="py-4 mx-2 text-center" type="title">
           {t("refractometerHeading")}
         </ThemedText>
-        <ThemedView className="flex-row w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("correctionFactor")}
           </ThemedText>
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={textInputs.cf}
             onChangeText={(text) => {
@@ -103,13 +103,12 @@ const Refractometer = () => {
             }}
           />
         </ThemedView>
-        <ThemedView className="flex-row items-center justify-center w-11/12">
-          <ThemedText type="defaultSemiBold" className="text-xl">
+        <ThemedView className="flex-row items-center justify-between w-11/12">
+          <ThemedText type="defaultSemiBold" className="mr-2 text-xl">
             {t("ogLabel")}
           </ThemedText>
 
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={textInputs.og}
             onChangeText={(text) => {
@@ -146,13 +145,12 @@ const Refractometer = () => {
             }}
           />
         </ThemedView>
-        <ThemedView className="flex-row items-center justify-center w-11/12">
+        <ThemedView className="flex-row items-center justify-between w-11/12 gap-2">
           <ThemedText type="defaultSemiBold" className="text-xl">
             {t("fgInBrix")}
           </ThemedText>
 
-          <TextInput
-            className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+          <CustomInput
             keyboardType="numeric"
             value={textInputs.fgInBrix}
             onChangeText={(text) => {

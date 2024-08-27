@@ -1,4 +1,5 @@
 import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useGlobalContext } from "@/context/GlobalProvider";
@@ -48,13 +49,12 @@ const submit = () => {
             </ThemedView>
             <ThemedView className="items-center text-center">
               <ThemedText className="text-2xl">Estimated FG:</ThemedText>
-              <TextInput
-                className="flex-1 w-24 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+              <CustomInput
                 onChangeText={(text) => changeFG(text)}
                 selectTextOnFocus
               >
                 {fgText}
-              </TextInput>
+              </CustomInput>
             </ThemedView>
           </ThemedView>
 

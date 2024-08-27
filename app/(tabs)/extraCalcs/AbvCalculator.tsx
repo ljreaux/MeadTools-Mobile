@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { toBrix } from "@/helpers/unitConverters";
 import AbvLine from "@/components/AbvLine";
 import { Keyboard } from "react-native";
+import CustomInput from "@/components/CustomInput";
 
 const AbvCalculator = () => {
   const { t } = useTranslation();
@@ -33,12 +34,11 @@ const AbvCalculator = () => {
               key={index}
               className="justify-between w-screen px-6 py-4"
             >
-              <ThemedView className="flex-row ">
+              <ThemedView className="flex-row items-center justify-between">
                 <ThemedText type="defaultSemiBold" className="text-xl">
                   {t(`${item.toLowerCase()}Label`)}
                 </ThemedText>
-                <TextInput
-                  className="flex-1 ml-8 text-base text-center bg-white border-2 bg-black-100 rounded-2xl focus:border-secondary"
+                <CustomInput
                   keyboardType="numeric"
                   id={item}
                   value={textValues[index]}
