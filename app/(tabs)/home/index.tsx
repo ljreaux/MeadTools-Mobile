@@ -1,7 +1,6 @@
 import {
   StyleSheet,
   Text,
-  TextInput,
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
@@ -303,7 +302,7 @@ export default function HomeScreen() {
             </ThemedView>
             <CustomButton
               title={`${t("recipeBuilder.submit")}`}
-              containerStyles="mb-24"
+              containerStyles="mb-24 mx-2"
               handlePress={() => {
                 setSubmit(true);
                 router.push("/home/submit");
