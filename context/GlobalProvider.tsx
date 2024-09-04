@@ -102,9 +102,15 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation();
   const sortingFn = (a: IngredientListItem, b: IngredientListItem) => {
     // putting Honey and Water at top of list
-    if (a.name === "Honey" || (a.name === "Water" && b.name !== "Honey"))
+    if (
+      a.name.toLowerCase() === "honey" ||
+      (a.name.toLowerCase() === "water" && b.name !== "honey")
+    )
       return -1;
-    if (b.name === "Honey" || (b.name === "Water" && a.name !== "Honey"))
+    if (
+      b.name.toLowerCase() === "honey" ||
+      (b.name.toLowerCase() === "water" && a.name.toLowerCase() !== "honey")
+    )
       return 1;
 
     const nameA = t(`${lodash.camelCase(a.name)}`).toLowerCase(); // ignore upper and lowercase
@@ -225,7 +231,7 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     setRecipeData((prev) => ({
       ...prev,
       OG: noSecondaryBlend.blendedValue,
-      FG: 0.996,
+      FG: prev.FG,
       offset: offsetArr.reduce((prev, curr) => {
         return curr / noSecondaryBlend.totalVolume + prev;
       }, 0),

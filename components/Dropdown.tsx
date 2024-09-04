@@ -61,13 +61,15 @@ export const DropdownComponent = ({
       sugar_content: brix,
       name,
       category,
-    } = ingredients.find(
-      (ingredient: IngredientListItem) => ingredient.name === value
-    ) || {
+    } = ingredients.find((ingredient: IngredientListItem) => {
+      return ingredient.name === value;
+    }) || {
       sugar_content: 0,
       name: "error",
       category: "error",
     };
+
+    console.log(brix);
 
     setRecipeData((prev) => {
       const newIngredients = prev.ingredients.map((ing, i) =>

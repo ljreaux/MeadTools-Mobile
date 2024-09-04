@@ -352,6 +352,17 @@ const IngredientRow = ({
       }),
     });
   }, [recipeData.units]);
+  useEffect(() => {
+    setTextDetails({
+      ingredients: recipeData.ingredients.map((ing) => {
+        return {
+          id: ing.id,
+          details: ing.details.map((det) => det.toString()),
+          brix: ing.brix.toString(),
+        };
+      }),
+    });
+  }, [recipeData.ingredients]);
 
   const createDetailCopy = (
     text: string,
@@ -410,9 +421,10 @@ const IngredientRow = ({
 
   function setIndividual(id: number, ingredient: Partial<IngredientType>) {
     setRecipeData((prev: RecipeData) => {
-      const newIngredient = prev.ingredients.map((ing) =>
-        ing.id === id ? { ...ing, ...ingredient } : ing
-      );
+      const newIngredient = prev.ingredients.map((ing) => {
+        console.log(ing.id, id);
+        return ing.id === id ? { ...ing, ...ingredient } : ing;
+      });
 
       return {
         ...prev,
@@ -450,7 +462,12 @@ const IngredientRow = ({
     }
   };
   const disabled = id < 3 && !ingredient.secondary;
-  const found = textDetails.ingredients.find((ing) => ing.id === id);
+  const [found, setFound] = useState(
+    textDetails.ingredients.find((ing) => ing.id === id)
+  );
+  useEffect(() => {
+    setFound(textDetails.ingredients.find((ing) => ing.id === id));
+  }, [textDetails.ingredients]);
 
   return (
     <ThemedView key={id}>
@@ -489,35 +506,45 @@ const IngredientRow = ({
           <ThemedText type="subtitle" className="my-2 font-semibold">
             {t("recipeBuilder.labels.weight")}
           </ThemedText>
-
-          <CustomInput
-            style={{ minWidth: 90 }}
-            value={found?.details[0]}
-            keyboardType="numeric"
-            placeholder="0"
-            placeholderTextColor={textColor}
-            onChangeText={(e) => {
-              setTextDetail(e, found?.id, 0);
-              updateIngredientAmount(e, found?.id || 0, 0, ingredient);
-            }}
-          />
+          {found?.details[0] && (
+            <CustomInput
+              style={{ minWidth: 90 }}
+              value={
+                found?.details[0].length < 6
+                  ? found?.details[0]
+                  : found?.details[0].substring(0, 6)
+              }
+              keyboardType="numeric"
+              placeholder="0"
+              placeholderTextColor={textColor}
+              onChangeText={(e) => {
+                setTextDetail(e, found?.id, 0);
+                updateIngredientAmount(e, found?.id || 0, 0, ingredient);
+              }}
+            />
+          )}
         </View>
 
         <View className="items-center mx-4 text-center">
           <ThemedText type="subtitle" className="my-2 font-semibold">
             {t("recipeBuilder.labels.volume")}
           </ThemedText>
-
-          <CustomInput
-            style={{ minWidth: 90 }}
-            value={found?.details[1]}
-            keyboardType="numeric"
-            placeholder="0"
-            onChangeText={(e) => {
-              setTextDetail(e, found?.id, 1);
-              updateIngredientAmount(e, found?.id || 0, 1, ingredient);
-            }}
-          />
+          {found?.details[1] && (
+            <CustomInput
+              style={{ minWidth: 90 }}
+              value={
+                found?.details[1].length < 6
+                  ? found?.details[1]
+                  : found?.details[1].substring(0, 6)
+              }
+              keyboardType="numeric"
+              placeholder="0"
+              onChangeText={(e) => {
+                setTextDetail(e, found?.id, 1);
+                updateIngredientAmount(e, found?.id || 0, 1, ingredient);
+              }}
+            />
+          )}
         </View>
       </View>
     </ThemedView>
