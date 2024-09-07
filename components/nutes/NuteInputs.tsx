@@ -9,6 +9,8 @@ import { ThemedView } from "../ThemedView";
 
 import BrandDropdown from "./BrandDropdown";
 import YeastDropdown from "./YeastDropdown";
+import { VolumeUnits } from "./VolumeUnits";
+import useChangeLogger from "@/hooks/useChangeLogger";
 interface MainInputs {
   selected: FormData["selected"];
   inputs: FormData["inputs"];
@@ -72,14 +74,6 @@ export default function NuteInputs({
   }, []);
   const { t } = useTranslation();
   const keyArr = Object.keys(maxGpl);
-
-  const handleChange = (e: any) => {
-    const target = e.target as HTMLFormElement;
-    setData((prev) => ({
-      ...prev,
-      inputs: { ...prev.inputs, [target.name]: Number(target.value) },
-    }));
-  };
 
   useEffect(() => {
     const yeastDetails = yeasts[selected.yeastBrand].find(
@@ -148,7 +142,15 @@ export default function NuteInputs({
       };
     });
 
-  useEffect(() => console.log(selected.yeastStrain), [selected.yeastStrain]);
+  const unitChange = (val: FormData["selected"]["volumeUnits"]) => {
+    setData((prev) => ({
+      ...prev,
+      selected: {
+        ...prev.selected,
+        volumeUnits: val,
+      },
+    }));
+  };
 
   return (
     <ThemedView>
@@ -158,6 +160,7 @@ export default function NuteInputs({
         onChange={yeastChange}
         currentBrand={selected.yeastBrand}
       />
+      <VolumeUnits onChange={unitChange} />
     </ThemedView>
   );
 }

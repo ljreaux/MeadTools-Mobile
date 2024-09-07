@@ -69,8 +69,6 @@ export const DropdownComponent = ({
       category: "error",
     };
 
-    console.log(brix);
-
     setRecipeData((prev) => {
       const newIngredients = prev.ingredients.map((ing, i) =>
         ing.id === id
