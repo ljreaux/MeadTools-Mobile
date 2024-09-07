@@ -1,20 +1,22 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useTranslation } from "react-i18next";
 import lodash from "lodash";
 import { Dropdown } from "react-native-element-dropdown";
 import { Selected } from "@/app/(tabs)/extraCalcs";
 
-const BrandDropdown = ({
+const YeastDropdown = ({
   data,
   onChange,
+  currentBrand,
 }: {
   data: string[];
-  onChange: (brand: Selected["yeastBrand"]) => void;
+  onChange: (brand: Selected["yeastStrain"]) => void;
+  currentBrand: Selected["yeastStrain"];
 }) => {
   const { t } = useTranslation();
-  const [value, setValue] = useState<null | string>("Lalvin");
+  const [value, setValue] = useState<null | string>(data[0]);
   const [isFocus, setIsFocus] = useState(false);
   const backgroundColor = useThemeColor({}, "background");
   const tint = useThemeColor({}, "tint");
@@ -29,16 +31,23 @@ const BrandDropdown = ({
             { backgroundColor, color: textColor },
           ]}
         >
-          {t("yeastBrand")}
+          {t("yeastStrain")}
         </Text>
       );
     }
     return null;
   };
   const yeastBrands = data.map((yeast) => ({
-    label: t(`${lodash.camelCase(yeast)}.label`),
-    value: yeast as Selected["yeastBrand"],
+    label: t(
+      `${lodash.camelCase(currentBrand)}.yeasts.${lodash.camelCase(yeast)}`
+    ),
+    value: yeast as Selected["yeastStrain"],
   }));
+
+  useEffect(() => {
+    setValue(data[0]);
+  }, [data[0]]);
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       {renderLabel()}
@@ -65,7 +74,7 @@ const BrandDropdown = ({
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(text: { value: Selected["yeastBrand"]; label: string }) => {
+        onChange={(text: { value: Selected["yeastStrain"]; label: string }) => {
           setValue(text.value);
           onChange(text.value);
         }}
@@ -74,7 +83,7 @@ const BrandDropdown = ({
   );
 };
 
-export default BrandDropdown;
+export default YeastDropdown;
 const styles = StyleSheet.create({
   container: {
     padding: 16,

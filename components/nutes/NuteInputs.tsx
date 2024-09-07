@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { ThemedView } from "../ThemedView";
 
 import BrandDropdown from "./BrandDropdown";
+import YeastDropdown from "./YeastDropdown";
 interface MainInputs {
   selected: FormData["selected"];
   inputs: FormData["inputs"];
@@ -132,16 +133,31 @@ export default function NuteInputs({
       selected: {
         ...prev.selected,
         yeastBrand: brand,
+        yeastStrain: yeasts[brand][0].name,
       },
     }));
   };
+  const yeastChange = (val: FormData["selected"]["yeastStrain"]) =>
+    setData((prev) => {
+      return {
+        ...prev,
+        selected: {
+          ...prev.selected,
+          yeastStrain: val,
+        },
+      };
+    });
+
+  useEffect(() => console.log(selected.yeastStrain), [selected.yeastStrain]);
 
   return (
     <ThemedView>
-      <BrandDropdown
-        data={Object.keys(yeasts)}
-        onChange={changeYeastBrand}
-      ></BrandDropdown>
+      <BrandDropdown data={Object.keys(yeasts)} onChange={changeYeastBrand} />
+      <YeastDropdown
+        data={yeasts[selected.yeastBrand].map((yeast) => yeast.name)}
+        onChange={yeastChange}
+        currentBrand={selected.yeastBrand}
+      />
     </ThemedView>
   );
 }
