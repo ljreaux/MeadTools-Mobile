@@ -69,6 +69,7 @@ export const VolumeUnits = ({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    flex: 0.5,
   },
   dropdown: {
     height: 50,

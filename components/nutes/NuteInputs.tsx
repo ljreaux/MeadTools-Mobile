@@ -10,7 +10,11 @@ import { ThemedView } from "../ThemedView";
 import BrandDropdown from "./BrandDropdown";
 import YeastDropdown from "./YeastDropdown";
 import { VolumeUnits } from "./VolumeUnits";
+import CustomInput from "../CustomInput";
+import { View } from "react-native";
 import useChangeLogger from "@/hooks/useChangeLogger";
+import { ThemedText } from "../ThemedText";
+
 interface MainInputs {
   selected: FormData["selected"];
   inputs: FormData["inputs"];
@@ -39,7 +43,7 @@ export default function NuteInputs({
     async function getYeasts() {
       try {
         const allYeasts = await getAllYeasts();
-        const Lalvin: [] = await allYeasts.filter(
+        const Lalvin = await allYeasts.filter(
           (yeast: Yeast) => yeast.brand == "Lalvin"
         );
         const Fermentis = await allYeasts.filter(
@@ -152,6 +156,24 @@ export default function NuteInputs({
     }));
   };
 
+  const [volumeText, setVolumeText] = useState(inputs.volume.toString());
+
+  useEffect(() => {
+    const numberValue = Number(volumeText);
+    if (!isNaN(numberValue))
+      setData((prev) => {
+        return {
+          ...prev,
+          inputs: {
+            ...prev.inputs,
+            volume: numberValue,
+          },
+        };
+      });
+  }, [volumeText]);
+
+  useChangeLogger(volumeText);
+
   return (
     <ThemedView>
       <BrandDropdown data={Object.keys(yeasts)} onChange={changeYeastBrand} />
@@ -160,7 +182,19 @@ export default function NuteInputs({
         onChange={yeastChange}
         currentBrand={selected.yeastBrand}
       />
-      <VolumeUnits onChange={unitChange} />
+      <ThemedText type="subtitle" className="mx-3 my-2 font-semibold">
+        {t("recipeBuilder.labels.volume")}
+      </ThemedText>
+      <View className="flex-row items-center justify-center mr-4 text-center">
+        <VolumeUnits onChange={unitChange} />
+        <View className="flex-[0.5] justify-center h-[50px]">
+          <CustomInput
+            value={volumeText}
+            onChangeText={setVolumeText}
+            keyboardType="numeric"
+          />
+        </View>
+      </View>
     </ThemedView>
   );
 }
